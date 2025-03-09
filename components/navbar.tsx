@@ -2,14 +2,18 @@ import React from "react";
 import { Button } from "./ui/button";
 import { SearchBar } from "./searchbar";
 import { MapPin } from "lucide-react";
+import Link from "next/link";
 
 const Navbar = () => {
   return (
     <header className="fixed top-2 left-0 z-50 w-full">
       <nav className="p-2 container flex justify-between items-center">
-        <h5 className="font-bold text-xl">
-          Bl<span className="text-blue-500 font-extrabold">o</span>cks
-        </h5>
+        <Link href="/" className="no-underline text-current">
+          <h5 className="font-bold text-xl">
+            Bl<span className="text-blue-500 font-extrabold">o</span>cks
+          </h5>
+        </Link>
+
         <SearchBar className="hidden md:flex" />
 
         <div className="flex items-center gap-2">
