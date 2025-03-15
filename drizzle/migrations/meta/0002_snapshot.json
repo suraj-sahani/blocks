@@ -1,6 +1,6 @@
 {
-  "id": "51878b64-35de-4bd5-80f3-bb17f85e0b55",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "c9107d6f-7eff-41e5-a9ef-bac6e8c1a884",
+  "prevId": "2fedbde6-3a23-48a8-8174-e1590b99c19f",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -33,6 +33,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "createdAt": {
           "name": "createdAt",
           "type": "timestamp with time zone",
@@ -52,6 +58,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "terms_conditions": {
+          "name": "terms_conditions",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
         }
       },
       "indexes": {},

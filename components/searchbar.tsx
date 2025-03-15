@@ -33,16 +33,9 @@ export function SearchBar({
     >
       <input
         type="text"
-        className="px-4 py-3 bg-gray-100 rounded-full w-full focus:outline-none"
+        className="px-4 py-3 bg-gray-100 rounded-xl w-full focus:outline-none"
         placeholder={placeholder}
       />
-      {/* <Input
-        type="text"
-        placeholder={placeholder}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        className="pr-10 bg-gray-100 px-4 py-4 h-11 rounded-full"
-      /> */}
       <Button
         type="submit"
         size="icon"

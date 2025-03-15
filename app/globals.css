@@ -43,6 +43,10 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  /* --shadow-xs: 0px 2px 8px 0px rgba(99, 99, 99, 0.2);
+  --shadow-sm: 0px 8px 24px rgba(149, 157, 165, 0.2);
+  --shadow-md: 0px 7px 29px 0px rgba(100, 100, 111, 0.2);
+  --shadow-lg: 0px 48px 100px 0px rgba(17, 12, 46, 0.15); */
 }
 
 :root {
@@ -79,10 +83,6 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
-  --shadow-xs: 0px 2px 8px 0px rgba(99, 99, 99, 0.2);
-  --shadow-sm: 0px 8px 24px rgba(149, 157, 165, 0.2);
-  --shadow-md: 0px 7px 29px 0px rgba(100, 100, 111, 0.2);
-  --shadow-lg: 0px 48px 100px 0px rgba(17, 12, 46, 0.15);
 }
 
 .dark {

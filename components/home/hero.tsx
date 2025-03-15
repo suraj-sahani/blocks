@@ -40,7 +40,7 @@ const Hero = () => {
         spots / charging stations in a flash.
       </p>
       <Button asChild className="rounded-full mt-6 px-12 h-10">
-        <Link href="/register">Get Started</Link>
+        <Link href="/sign-up">Get Started</Link>
       </Button>
 
       <div>

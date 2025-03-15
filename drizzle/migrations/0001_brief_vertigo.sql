@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "terms_conditions" boolean DEFAULT false;

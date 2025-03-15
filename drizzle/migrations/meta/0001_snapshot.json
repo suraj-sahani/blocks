@@ -1,6 +1,6 @@
 {
-  "id": "51878b64-35de-4bd5-80f3-bb17f85e0b55",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "2fedbde6-3a23-48a8-8174-e1590b99c19f",
+  "prevId": "51878b64-35de-4bd5-80f3-bb17f85e0b55",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -52,6 +52,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "terms_conditions": {
+          "name": "terms_conditions",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
         }
       },
       "indexes": {},
