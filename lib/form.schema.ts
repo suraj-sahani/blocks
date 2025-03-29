@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+export const signInSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Email is required.")
+    .email("Please enter a valid email."),
+  password: z.string().min(1, "Password is required"),
+});
+
 export const signUpSchema = z.object({
   firstName: z.string().min(1, "First Name is required."),
   lastName: z.string().optional(),

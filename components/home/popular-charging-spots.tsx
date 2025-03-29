@@ -18,7 +18,7 @@ const PopularChargingSpots = () => {
     <div className="container">
       <Carousel
         opts={{
-          align: "center",
+          align: "start",
         }}
       >
         <CarouselContent>

@@ -8,10 +8,12 @@ import { SpotType } from "@/lib/enum";
 
 type SpotCardProps<T> = {
   detail: T;
+  className?: string;
 };
 
 const SpotCard = <T extends ParkingSpot | ChargingSpot>({
   detail,
+  className,
 }: SpotCardProps<T>) => {
   const renderPrice = () => {
     switch (detail?.type) {
@@ -36,9 +38,11 @@ const SpotCard = <T extends ParkingSpot | ChargingSpot>({
     }
   };
   return (
-    <Card className="p-0 rounded-2xl min-h-[480px] shadow-xs w-[350px] max-w-sm overflow-hidden">
+    <Card
+      className={`p-0 rounded-2xl min-h-[480px] shadow-xs w-full overflow-hidden ${className}`}
+    >
       <CardContent
-        className="relative w-ful m-1.5 p-2 flex items-end flex-1 bg-gray-100 rounded-2xl bg-cover"
+        className="relative m-1.5 p-2 flex items-end flex-1 bg-gray-100 rounded-2xl bg-cover"
         style={{
           backgroundImage: `linear-gradient(to bottom, rgba(255, 255, 255, 0.25), rgba(0, 0, 0)),
     url(${detail?.imageUrl})`,

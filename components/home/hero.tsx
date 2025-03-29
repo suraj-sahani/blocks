@@ -44,11 +44,8 @@ const Hero = () => {
       </Button>
 
       <div>
-        <Tabs
-          defaultValue="parking-spots"
-          className="w-[400px] items-center mt-8"
-        >
-          <TabsList className="h-11 mb-8">
+        <Tabs defaultValue="parking-spots" className=" items-center mt-8">
+          <TabsList className="w-[400px] h-11 mb-8">
             <TabsTrigger value="parking-spots" className="h-full">
               <ParkingMeter />
               Parking Spots

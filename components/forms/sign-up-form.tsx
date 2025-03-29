@@ -17,8 +17,10 @@ import { createUser } from "@/actions/user.actions";
 import { usersTable } from "@/drizzle/schema/user.schema";
 import toast from "react-hot-toast";
 import Spinner from "../spinner";
+import { redirect, useRouter } from "next/navigation";
 
 const SignupForm = () => {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [disable, setDisable] = useState(false);
   const [subitting, setSubmitting] = useState(false);
@@ -48,6 +50,7 @@ const SignupForm = () => {
         throw new Error(details?.message);
       }
       toast.success("User Created Successfully.");
+      router.push("/");
     } catch (error: any) {
       toast.error(error?.message);
     }

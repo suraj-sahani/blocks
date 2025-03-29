@@ -1,3 +1,4 @@
+import { JWTPayload } from "jose";
 import { SpotType } from "./enum";
 
 export interface ParkingSpot {
@@ -32,4 +33,11 @@ export interface ChargingSpot {
   totalSpots: number;
   type: string;
   address: string;
+}
+
+export interface SessionPayload extends JWTPayload {
+  id: string;
+  first_name: string;
+  last_name: string | null;
+  imageUrl: string | null;
 }

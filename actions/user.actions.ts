@@ -2,6 +2,7 @@
 import { usersTable } from "@/drizzle/schema/user.schema";
 import { db } from "@/drizzle/db";
 import { eq } from "drizzle-orm";
+import { deleteSession } from "@/lib/session";
 
 export const createUser = async (
   userDetails: typeof usersTable.$inferInsert
@@ -21,3 +22,5 @@ export const createUser = async (
     throw new Error(error?.message);
   }
 };
+
+export const logoutUser = async () => await deleteSession();
