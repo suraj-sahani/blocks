@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Role } from "./enum";
 
 export const signInSchema = z.object({
   email: z
@@ -6,6 +7,7 @@ export const signInSchema = z.object({
     .min(1, "Email is required.")
     .email("Please enter a valid email."),
   password: z.string().min(1, "Password is required"),
+  role: z.enum([Role.USER, Role.HOST], { required_error: "Role is required." }),
 });
 
 export const signUpSchema = z.object({

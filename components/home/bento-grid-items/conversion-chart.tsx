@@ -44,7 +44,7 @@ export function ConversionChart() {
       <CardContent className="flex flex-1 items-center pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square w-full max-w-[250px]"
+          className="mx-auto aspect-square w-full max-w-[200px]"
         >
           <RadialBarChart
             data={chartData}
@@ -100,7 +100,7 @@ export function ConversionChart() {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
+        <div className="flex flex-col items-center gap-2 font-medium leading-none">
           Trending up by{" "}
           <span className="text-blue-500 font-extrabold">5.2%</span> this month{" "}
           <TrendingUp className="h-4 w-4" />

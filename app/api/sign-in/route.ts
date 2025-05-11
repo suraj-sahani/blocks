@@ -3,11 +3,14 @@ import { usersTable } from "@/drizzle/schema/user.schema";
 import { createSession } from "@/lib/session";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
     const user = await request.json();
+    console.log(user);
+
     // Check if user exists in db
     const existingUser = await db.query.usersTable.findFirst({
       where: eq(usersTable.email, user.email),
@@ -44,6 +47,11 @@ export async function POST(request: NextRequest) {
       first_name: firstName,
       last_name: lastName,
       imageUrl,
+    });
+    const cookiesStore = await cookies();
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    cookiesStore.set("role", user?.role, {
+      expires: expiresAt,
     });
     return NextResponse.json({
       message: "User Signed In Successfully.",

@@ -49,5 +49,6 @@ export async function getExistingSession() {
 export async function deleteSession() {
   const cookieStore = await cookies();
   cookieStore.delete("session");
+  cookieStore.delete("role");
   redirect("/sign-in");
 }

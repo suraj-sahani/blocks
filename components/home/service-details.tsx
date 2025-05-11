@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { HardDriveDownload } from "lucide-react";
-import { ConversionChart } from "./bento-grid-items/conversion-chat";
+import { ConversionChart } from "./bento-grid-items/conversion-chart";
 
 const ServiceDetails = () => {
   return (

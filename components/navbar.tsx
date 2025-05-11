@@ -9,7 +9,6 @@ import MainNav from "./main-nav";
 
 const Navbar = async () => {
   const user = await getExistingSession();
-  console.log(user);
 
   return (
     <>

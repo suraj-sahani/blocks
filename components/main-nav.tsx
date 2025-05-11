@@ -14,7 +14,7 @@ type Props = {
 
 const MainNav = ({ user }: Props) => {
   return (
-    <header className="fixed top-2 left-0 z-50 w-full">
+    <header className="fixed top-0 left-0 z-50 w-full">
       <nav className="p-2 container flex justify-between items-center">
         <Link href="/" className="no-underline text-current">
           <h5 className="font-bold text-xl">

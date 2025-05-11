@@ -12,6 +12,8 @@ import { z } from "zod";
 import Spinner from "../spinner";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import RoleSelector from "../role-selector";
+import { Role } from "@/lib/enum";
 
 const SignInForm = () => {
   const router = useRouter();
@@ -21,6 +23,7 @@ const SignInForm = () => {
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(signInSchema),
@@ -30,8 +33,9 @@ const SignInForm = () => {
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
     setDisable(true);
     try {
+      const { email, password, role } = data;
       const res = await fetch("api/sign-in", {
-        body: JSON.stringify(data),
+        body: JSON.stringify({ email, password, role }),
         method: "POST",
       });
       const details = await res.json();
@@ -39,7 +43,8 @@ const SignInForm = () => {
         throw new Error(details?.message);
       }
       toast.success("Signed In Successfully.");
-      router.push("/");
+      if (role === Role.USER) router.push("/user/dashboard");
+      else router.push("/host/dashboard");
     } catch (error: any) {
       toast.error(error?.message);
       console.error(error);
@@ -84,7 +89,10 @@ const SignInForm = () => {
               size="icon"
               variant="ghost"
               className="absolute right-1 h-full px-3 py-2 text-muted-foreground hover:bg-transparent rounded-full cursor-pointer"
-              onClick={() => setShowPassword((prev) => !prev)}
+              onClick={(e) => {
+                e?.preventDefault();
+                setShowPassword((prev) => !prev);
+              }}
             >
               {showPassword ? (
                 <EyeOff className="h-4 w-4" />
@@ -96,6 +104,15 @@ const SignInForm = () => {
           {errors.password && (
             <p className="mt-1 text-xs font-medium text-red-500">
               {errors.password.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <RoleSelector onChange={(value) => setValue("role", value)} />
+          {errors.role && (
+            <p className="mt-1 text-xs font-medium text-red-500">
+              {errors.role.message}
             </p>
           )}
         </div>
