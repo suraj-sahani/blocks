@@ -1,7 +1,11 @@
+import Map from "@/components/map";
+import Sidebar from "@/components/sidebar";
+
 export default async function UserDashboardPage() {
   return (
-    <div>
-      <h1>Dashboard</h1>
-    </div>
+    <section className="relative bg-slate-300 m-2 h-full rounded-xl overflow-hidden">
+      <Sidebar />
+      <Map />
+    </section>
   );
 }

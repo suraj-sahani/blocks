@@ -22,7 +22,7 @@ const MainNav = ({ user }: Props) => {
           </h5>
         </Link>
 
-        <SearchBar className="hidden md:flex" />
+        <SearchBar className="hidden md:flex max-w-sm" />
 
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1">

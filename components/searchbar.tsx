@@ -29,11 +29,11 @@ export function SearchBar({
   return (
     <form
       onSubmit={handleSubmit}
-      className={`relative flex w-full max-w-sm items-center ${className}`}
+      className={`relative flex w-full items-center ${className}`}
     >
       <input
         type="text"
-        className="px-4 py-3 bg-gray-100 rounded-xl w-full focus:outline-none"
+        className="px-4 py-3 bg-gray-100 rounded-2xl w-full focus:outline-none"
         placeholder={placeholder}
       />
       <Button
