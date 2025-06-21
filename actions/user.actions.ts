@@ -15,9 +15,18 @@ export const createUser = async (
 
     if (existingUser) throw new Error("User already exists.");
     const user = await db.insert(usersTable).values(userDetails).returning();
-    return user;
-  } catch (error: any) {
-    throw new Error(error?.message);
+    return {
+      success: true,
+      message: "User created successfully.",
+      data: user,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Failed to create user.",
+      data: null,
+    };
   }
 };
 

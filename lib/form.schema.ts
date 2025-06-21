@@ -1,5 +1,7 @@
 import { z } from "zod";
+import { createSelectSchema } from "drizzle-zod";
 import { Role } from "./enum";
+import { evChargingTable, parkingAreaTable } from "@/drizzle/schema";
 
 export const signInSchema = z.object({
   email: z
@@ -33,3 +35,30 @@ export const signUpDV: z.infer<typeof signUpSchema> = {
   imageUrl: "",
   terms_conditions: false,
 };
+
+export const LocationType = z.enum(["parking", "ev"]);
+export const ParkingLocationSchema = createSelectSchema(parkingAreaTable)
+  .omit({
+    id: true,
+    created_at: true,
+    updated_at: true,
+    host_id: true,
+    city_id: true,
+    state_id: true,
+  })
+  .extend({
+    locationType: LocationType.enum.parking,
+  });
+
+export const EVChargingSchema = createSelectSchema(evChargingTable)
+  .omit({
+    id: true,
+    created_at: true,
+    updated_at: true,
+    city_id: true,
+    state_id: true,
+    host_id: true,
+  })
+  .extend({
+    locationType: LocationType.enum.ev,
+  });

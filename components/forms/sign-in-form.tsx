@@ -45,8 +45,12 @@ const SignInForm = () => {
       toast.success("Signed In Successfully.");
       if (role === Role.USER) router.push("/user/dashboard");
       else router.push("/host/dashboard");
-    } catch (error: any) {
-      toast.error(error?.message);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again later."
+      );
       console.error(error);
     }
     setDisable(false);

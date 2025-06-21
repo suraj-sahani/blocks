@@ -1,5 +1,10 @@
 import { JWTPayload } from "jose";
 import { SpotType } from "./enum";
+import { z } from "zod/v4";
+import { ParkingLocationSchema } from "./form.schema";
+
+export interface ParkingLocation
+  extends z.infer<typeof ParkingLocationSchema> {}
 
 export interface ParkingSpot {
   title: string;

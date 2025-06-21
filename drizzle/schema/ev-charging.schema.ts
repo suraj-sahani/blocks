@@ -6,14 +6,13 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
-import { stateTable } from "./state.schema";
+
 import { cityTable } from "./city.schema";
+import { stateTable } from "./state.schema";
 import { usersTable } from "./user.schema";
 
-export const parkingAreaTable = pgTable("parking_area", {
+export const evChargingTable = pgTable("ev_charging", {
   id: uuid("id").primaryKey().defaultRandom(),
-  address_line_1: text("address_line_1").notNull(),
-  address_line_2: text("address_line_2"),
   created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated_at: timestamp({ withTimezone: true })
     .notNull()
@@ -23,6 +22,8 @@ export const parkingAreaTable = pgTable("parking_area", {
   name: text("name").notNull(),
   latitude: doublePrecision("latitude").notNull(),
   longitude: doublePrecision("longitude").notNull(),
+  address_line_1: text("address_line_1").notNull(),
+  address_line_2: text("address_line_2"),
   total_slots: integer("total_slots").notNull(),
   state_id: uuid("state_id")
     .notNull()
@@ -33,21 +34,23 @@ export const parkingAreaTable = pgTable("parking_area", {
   host_id: uuid("host_id")
     .notNull()
     .references(() => usersTable.id),
+  charging_station_power: text("charging_station_power").notNull(),
+  charging_station_price: text("charging_station_price").notNull(),
 });
 
-export const parkingAreaSlotTable = pgTable("parking_area_slot", {
+export const evChargingSlotTable = pgTable("ev_charging_slot", {
   id: uuid("id").primaryKey().defaultRandom(),
   created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated_at: timestamp({ withTimezone: true })
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
-  parking_area_id: uuid("parking_area_id")
+  ev_charging_id: uuid("ev_charging_id")
     .notNull()
-    .references(() => parkingAreaTable.id),
+    .references(() => evChargingTable.id),
 });
 
-export const amenitiesTable = pgTable("amenities", {
+export const connectorTable = pgTable("connectors", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
@@ -56,25 +59,36 @@ export const amenitiesTable = pgTable("amenities", {
     .defaultNow()
     .$onUpdate(() => new Date()),
   description: text("description").notNull(),
+  image_url: text("image_url").notNull(),
 });
 
-// Many to many relationship to get parking area amenities
-export const parkingAreaAmenitiesTable = pgTable("parking_area_amenities", {
-  parking_area_id: uuid("parking_area_id").references(
-    () => parkingAreaTable.id
-  ),
-  amenities_id: uuid("amenities_id").references(() => amenitiesTable.id),
-});
+export const evChargingToConnectorsTable = pgTable(
+  "ev_charging_to_connectors",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ev_charging_id: uuid("ev_charging_id")
+      .notNull()
+      .references(() => evChargingTable.id),
+    connector_id: uuid("connector_id")
+      .notNull()
+      .references(() => connectorTable.id),
+    created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updated_at: timestamp({ withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  }
+);
 
-export const parkingAreaImagesTable = pgTable("parking_area_images", {
+export const evChargingImagesTable = pgTable("ev_charging_images", {
   id: uuid("id").primaryKey().defaultRandom(),
+  ev_charging_id: uuid("ev_charging_id")
+    .notNull()
+    .references(() => evChargingTable.id),
   image_url: text("image_url").notNull(),
   created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated_at: timestamp({ withTimezone: true })
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
-  parking_area_id: uuid("parking_area_id")
-    .notNull()
-    .references(() => parkingAreaTable.id),
 });
