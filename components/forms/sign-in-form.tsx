@@ -1,19 +1,19 @@
 "use client";
-import React, { useState } from "react";
-import { Card } from "../ui/card";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { signInSchema } from "@/lib/form.schema";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { Eye, EyeOff } from "lucide-react";
-import { z } from "zod";
-import Spinner from "../spinner";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import RoleSelector from "../role-selector";
 import { Role } from "@/lib/enum";
+import { signInSchema } from "@/lib/form.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { z } from "zod/v4";
+import RoleSelector from "../role-selector";
+import Spinner from "../spinner";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
 const SignInForm = () => {
   const router = useRouter();
@@ -25,7 +25,7 @@ const SignInForm = () => {
     control,
     setValue,
     formState: { errors },
-  } = useForm({
+  } = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     mode: "onSubmit",
   });

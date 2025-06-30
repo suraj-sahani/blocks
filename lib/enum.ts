@@ -7,3 +7,8 @@ export enum Role {
   USER = "user",
   HOST = "host",
 }
+
+export enum LocationType {
+  PARKING = "parking",
+  EV = "ev",
+}

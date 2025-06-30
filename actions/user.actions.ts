@@ -1,8 +1,8 @@
 "use server";
-import { usersTable } from "@/drizzle/schema/user.schema";
 import { db } from "@/drizzle/db";
-import { eq } from "drizzle-orm";
+import { usersTable } from "@/drizzle/schema/user.schema";
 import { deleteSession } from "@/lib/session";
+import { eq } from "drizzle-orm";
 
 export const createUser = async (
   userDetails: typeof usersTable.$inferInsert

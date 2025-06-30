@@ -1,13 +1,8 @@
+import { Env } from "./env";
+
 declare global {
   namespace NodeJS {
-    interface ProcessEnv {
-      DATABASE_URL: string;
-      IMAGEKIT_PRIVATE_KEY: string;
-      IMAGEKIT_PUBLIC_KEY: string;
-      SESSION_SECRET: string;
-      NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT: string;
-      NEXT_PUBLIC_MAPBOX_TOKEN: string;
-    }
+    interface ProcessEnv extends Env {}
   }
 }
 

@@ -1,19 +1,19 @@
-import { UploadResponse } from "@imagekit/next";
 import { ImageUp, X } from "lucide-react";
 import Image from "next/image";
-import React, { useRef, useState } from "react";
-import toast from "react-hot-toast";
+import React, { useRef } from "react";
 import { Button } from "./ui/button";
 
 type ImageUploadProps = {
   multiple?: boolean;
   uploadedImages: File[];
   setUploadedImages: React.Dispatch<React.SetStateAction<File[]>>;
+  onChange?: (e: File[] | undefined) => void;
 };
 const ImageUpload = ({
   multiple = false,
   uploadedImages,
   setUploadedImages,
+  onChange,
 }: ImageUploadProps) => {
   // Create a ref for the file input element to access its files easily
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -28,7 +28,10 @@ const ImageUpload = ({
 
     // Convert FileList to Array and append to existing images
     const newFiles = Array.from(files);
-    setUploadedImages((prev) => [...prev, ...newFiles]);
+    onChange?.([...uploadedImages, ...newFiles]);
+    setUploadedImages((prev) => {
+      return [...prev, ...newFiles];
+    });
   };
 
   const handleImageRemove = (indexToRemove: number) => {
