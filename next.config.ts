@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
-import { envSchema } from "./env";
+import { ENV_SCHEMA } from "./lib/schema";
 
-envSchema.parse(process.env);
+
+ENV_SCHEMA.parse(process.env);
 
 const nextConfig: NextConfig = {
   /* config options here */

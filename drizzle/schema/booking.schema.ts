@@ -1,64 +1,103 @@
-import {
-  doublePrecision,
-  pgEnum,
-  pgTable,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
-import { usersTable } from "./user.schema";
-import { parkingAreaSlotTable, parkingAreaTable } from "./parking-area.schema";
+import { relations } from "drizzle-orm";
+import { decimal, integer, pgEnum, pgTable, smallint, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { vehicleBodyTypeEnum } from "./vehicle.schema";
+import { evChargingSlots, evConnectorTypeEnum, evStations, parkingAreas, parkingSlots } from "./location.schema";
+import { payments, paymentStatusEnum } from "./payment.schema";
+import { users, userVehicles } from "./user.schema";
 
-export const bookingStatusEnum = pgEnum("booking_status", [
-  "pending", // Waiting for approaval from host
-  "approved", // Approved by the host
-  "rejected", // Rejected by the host
-  "cancelled", // Booking was cancelled by the user
-  "completed", // Booking was completed
-]);
-export const paymentMethod = pgEnum("payment_method", ["card", "cash"]);
-export const paymentStatus = pgEnum("payment_status", [
-  "pending", // Initial or "requires_payment_method"
-  "requires_action", // Stripe needs customer interaction
-  "processing", // In progress
-  "authorized", // (if using manual capture)
-  "failed", // Failed payment
-  "canceled", // Canceled payment
-  "succeeded", // Payment succeeded
-]);
-
-export const bookingTable = pgTable("booking", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp({ withTimezone: true })
+export const parkingBookings = pgTable("parking_bookings", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
     .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-  slot_id: uuid("slot_id")
+    .references(() => users.id, { onDelete: "cascade" }),
+  userVehicleId: uuid("user_vehicle_id") // NEW: Which vehicle is being used for this booking
     .notNull()
-    .references(() => parkingAreaSlotTable.id),
-  user_id: uuid("user_id")
+    .references(() => userVehicles.id, { onDelete: "cascade" }),
+  parkingAreaId: uuid("parking_area_id") // NEW: Direct link to parking area
     .notNull()
-    .references(() => usersTable.id),
-  parking_area_id: uuid("parking_area_id")
+    .references(() => parkingAreas.id, { onDelete: "cascade" }),
+  parkingSlotId: uuid("parking_slot_id")
     .notNull()
-    .references(() => parkingAreaTable.id),
-  booking_status: bookingStatusEnum().default("pending"),
-  payment_status: paymentStatus().default("pending"),
-  start_time: timestamp({ withTimezone: true }).notNull(),
-  end_time: timestamp({ withTimezone: true }).notNull(),
+    .references(() => parkingSlots.id, { onDelete: "cascade" }),
+  vehicleBodyType: vehicleBodyTypeEnum("vehicle_body_type").notNull(), // UPDATED
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time").notNull(),
+  actualCheckIn: timestamp("actual_check_in"),
+  actualCheckOut: timestamp("actual_check_out"),
+  totalCost: decimal("total_cost", { precision: 10, scale: 2 }), // Calculated based on pricePerHour and duration
+  status: varchar("status", { length: 50 }).notNull().default("confirmed"), // Booking status (e.g., 'pending', 'confirmed', 'completed', 'cancelled')
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const paymentTable = pgTable("payment", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
-  updated_at: timestamp({ withTimezone: true })
+export const evChargingBookings = pgTable("ev_charging_bookings", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
     .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
-  booking_id: uuid("booking_id")
+    .references(() => users.id, { onDelete: "cascade" }),
+  userVehicleId: uuid("user_vehicle_id") // NEW: Which vehicle is being charged
     .notNull()
-    .references(() => bookingTable.id),
-  amount: doublePrecision("amount").notNull(),
-  payment_method: paymentMethod().notNull(),
-  payment_status: paymentStatus().default("pending"),
+    .references(() => userVehicles.id, { onDelete: "cascade" }),
+  evStationId: uuid("ev_station_id")
+    .notNull()
+    .references(() => evStations.id, { onDelete: "cascade" }),
+  evChargingSlotId: uuid("ev_charging_slot_id")
+    .notNull()
+    .references(() => evChargingSlots.id, { onDelete: "cascade" }),
+  connectorTypeUsed: evConnectorTypeEnum("connector_type_used").notNull(), // Which connector type the user booked/used
+  startTime: timestamp("start_time").notNull(), // Planned start of charging
+  endTime: timestamp("end_time"), // Planned end, could be null if "charge until full"
+  actualStartTime: timestamp("actual_start_time"), // When charging actually started
+  actualEndTime: timestamp("actual_end_time"), // When charging actually ended
+  energyConsumedKwh: decimal("energy_consumed_kwh", { precision: 10, scale: 3 }), // How much energy was consumed
+  totalCost: decimal("total_cost", { precision: 10, scale: 2 }), // Calculated based on pricePerKwh and energyConsumedKwh
+  status: varchar("status", { length: 50 }).notNull().default("confirmed"), // Booking status
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export const parkingBookingsRelations = relations(
+  parkingBookings,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [parkingBookings.userId],
+      references: [users.id],
+    }),
+    userVehicle: one(userVehicles, { // NEW RELATION
+      fields: [parkingBookings.userVehicleId],
+      references: [userVehicles.id],
+    }),
+    parkingArea: one(parkingAreas, { // NEW RELATION
+      fields: [parkingBookings.parkingAreaId],
+      references: [parkingAreas.id],
+    }),
+    parkingSlot: one(parkingSlots, {
+      fields: [parkingBookings.parkingSlotId],
+      references: [parkingSlots.id],
+    }),
+    payment: one(payments),
+  })
+);
+
+export const evChargingBookingsRelations = relations(
+  evChargingBookings,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [evChargingBookings.userId],
+      references: [users.id],
+    }),
+    userVehicle: one(userVehicles, { // NEW RELATION
+      fields: [evChargingBookings.userVehicleId],
+      references: [userVehicles.id],
+    }),
+    evStation: one(evStations, { // NEW RELATION
+      fields: [evChargingBookings.evStationId],
+      references: [evStations.id],
+    }),
+    evChargingSlot: one(evChargingSlots, {
+      fields: [evChargingBookings.evChargingSlotId],
+      references: [evChargingSlots.id],
+    }),
+    payment: one(payments),
+  })
+);
