@@ -1,9 +1,9 @@
 import { relations } from "drizzle-orm";
 import { decimal, integer, pgEnum, pgTable, smallint, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
-import { vehicleBodyTypeEnum } from "./vehicle.schema";
-import { evChargingSlots, evConnectorTypeEnum, evStations, parkingAreas, parkingSlots } from "./location.schema";
+import { evChargingSlots, evStations, parkingAreas, parkingSlots } from "./location.schema";
 import { payments, paymentStatusEnum } from "./payment.schema";
 import { users, userVehicles } from "./user.schema";
+import { evConnectorTypeEnum, vehicleBodyTypeEnum } from "./enum"
 
 export const parkingBookings = pgTable("parking_bookings", {
   id: uuid("id").defaultRandom().primaryKey(),

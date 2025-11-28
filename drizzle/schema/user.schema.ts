@@ -1,9 +1,9 @@
 import { boolean, integer, pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
-import { vehicleBodyTypeEnum } from "./vehicle.schema";
-import { evConnectorTypeEnum, evStations, parkingAreas } from "./location.schema";
+import { evStations, parkingAreas } from "./location.schema";
 import { relations } from "drizzle-orm";
 import { evChargingBookings, parkingBookings } from "./booking.schema";
 import { payments } from "./payment.schema";
+import { evConnectorTypeEnum, vehicleBodyTypeEnum } from "./enum"
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -17,6 +17,16 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export const usersRelations = relations(users, ({ many }) => ({
+  userVehicles: many(userVehicles),
+  parkingBookings: many(parkingBookings),
+  evChargingBookings: many(evChargingBookings),
+  parkingAreas: many(parkingAreas),
+  evStations: many(evStations),
+  userImages: many(userImages),
+  payments: many(payments),
+}));
 
 export const userImages = pgTable("user_images", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -80,9 +90,4 @@ export const userVehiclesRelations = relations(userVehicles, ({ one, many }) => 
     references: [users.id],
   }),
   parkingBookings: many(parkingBookings), // This vehicle can be used in parking bookings
-  evChargingBookings: many(evChargingBookings), // This vehicle can be used in EV charging bookings
-  parkingAreas: many(parkingAreas),
-  evStations: many(evStations),
-  userImages: many(userImages), // NEW RELATION to user_images
-  payments: many(payments),
 }));
