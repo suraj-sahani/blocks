@@ -1,8 +1,25 @@
 import { relations } from "drizzle-orm";
-import { boolean, decimal, integer, pgEnum, pgTable, primaryKey, smallint, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  decimal,
+  integer,
+  pgEnum,
+  pgTable,
+  primaryKey,
+  smallint,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { evChargingBookings, parkingBookings } from "./booking.schema";
 import { users } from "./user.schema";
-import { evChargingLevelEnum, evConnectorTypeEnum, parkingSlotTypeEnum, vehicleBodyTypeEnum } from "./enum"
+import {
+  evChargingLevelEnum,
+  evConnectorTypeEnum,
+  parkingSlotTypeEnum,
+  vehicleBodyTypeEnum,
+} from "./enum";
 
 export const parkingAreas = pgTable("parking_areas", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -11,8 +28,9 @@ export const parkingAreas = pgTable("parking_areas", {
     .references(() => users.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 256 }).notNull(),
   address: varchar("address", { length: 512 }).notNull(),
-  city: varchar("city", { length: 256 }).notNull(),
-  state: varchar("state", { length: 256 }).notNull(),
+  cityId: uuid("city_id")
+    .notNull()
+    .references(() => cities.id),
   zipCode: varchar("zip_code", { length: 10 }).notNull(),
   latitude: decimal("latitude", { precision: 10, scale: 7 }),
   longitude: decimal("longitude", { precision: 10, scale: 7 }),
@@ -31,8 +49,9 @@ export const evStations = pgTable("ev_stations", {
     .references(() => users.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 256 }).notNull(), // Name of the EV charging station
   address: varchar("address", { length: 512 }).notNull(), // Full address
-  city: varchar("city", { length: 256 }).notNull(),
-  state: varchar("state", { length: 256 }).notNull(),
+  cityId: uuid("city_id")
+    .notNull()
+    .references(() => cities.id),
   zipCode: varchar("zip_code", { length: 10 }).notNull(),
   latitude: decimal("latitude", { precision: 10, scale: 7 }),
   longitude: decimal("longitude", { precision: 10, scale: 7 }),
@@ -48,7 +67,6 @@ export const evStations = pgTable("ev_stations", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
-
 
 export const amenities = pgTable("amenities", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -112,26 +130,37 @@ export const evStationAmenitiesRelations = relations(
   })
 );
 
-export const parkingAreasRelations = relations(parkingAreas, ({ one, many }) => ({
-  owner: one(users, {
-    fields: [parkingAreas.userId],
-    references: [users.id],
-  }),
-  parkingSlots: many(parkingSlots),
-  parkingBookings: many(parkingBookings), // Add this relation if needed to see all bookings for an area
-  parkingAreaImages: many(parkingAreaImages), // NEW RELATION to parking_area_images
-  parkingAreaAmenities: many(parkingAreaAmenities)
-}));
+export const parkingAreasRelations = relations(
+  parkingAreas,
+  ({ one, many }) => ({
+    owner: one(users, {
+      fields: [parkingAreas.userId],
+      references: [users.id],
+    }),
+    city: one(cities, {
+      fields: [parkingAreas.cityId],
+      references: [cities.id],
+    }),
+    parkingSlots: many(parkingSlots),
+    parkingBookings: many(parkingBookings), // Add this relation if needed to see all bookings for an area
+    parkingAreaImages: many(parkingAreaImages), // NEW RELATION to parking_area_images
+    parkingAreaAmenities: many(parkingAreaAmenities),
+  })
+);
 
 export const evStationsRelations = relations(evStations, ({ one, many }) => ({
   owner: one(users, {
     fields: [evStations.userId],
     references: [users.id],
   }),
+  city: one(cities, {
+    fields: [evStations.cityId],
+    references: [cities.id],
+  }),
   evChargingSlots: many(evChargingSlots),
   evChargingBookings: many(evChargingBookings), // Add this relation to directly get bookings for a station
   evStationImages: many(evStationImages), // NEW RELATION to ev_station_images
-  evStationAmenities: many(evStationAmenities)
+  evStationAmenities: many(evStationAmenities),
 }));
 
 export const parkingAreaImages = pgTable("parking_area_images", {
@@ -211,14 +240,17 @@ export const parkingSlots = pgTable("parking_slots", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const parkingSlotsRelations = relations(parkingSlots, ({ one, many }) => ({
-  parkingArea: one(parkingAreas, {
-    fields: [parkingSlots.parkingAreaId],
-    references: [parkingAreas.id],
-  }),
-  prices: many(parkingSlotPrices),
-  parkingBookings: many(parkingBookings),
-}));
+export const parkingSlotsRelations = relations(
+  parkingSlots,
+  ({ one, many }) => ({
+    parkingArea: one(parkingAreas, {
+      fields: [parkingSlots.parkingAreaId],
+      references: [parkingAreas.id],
+    }),
+    prices: many(parkingSlotPrices),
+    parkingBookings: many(parkingBookings),
+  })
+);
 
 export const parkingSlotPrices = pgTable("parking_slot_prices", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -226,7 +258,10 @@ export const parkingSlotPrices = pgTable("parking_slot_prices", {
     .notNull()
     .references(() => parkingSlots.id, { onDelete: "cascade" }),
   vehicleBodyType: vehicleBodyTypeEnum("vehicle_body_type").notNull(),
-  pricePerHour: decimal("price_per_hour", { precision: 10, scale: 2 }).notNull(),
+  pricePerHour: decimal("price_per_hour", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -240,3 +275,35 @@ export const parkingSlotPricesRelations = relations(
     }),
   })
 );
+
+export const states = pgTable("states", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: varchar("name", { length: 256 }).unique().notNull(), // e.g., "California"
+  abbreviation: varchar("abbreviation", { length: 2 }).unique().notNull(), // e.g., "CA"
+  // REMOVED: countryCode: varchar("country_code", { length: 2 }).notNull().default("US"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const statesRelations = relations(states, ({ many }) => ({
+  cities: many(cities), // A state has many cities
+}));
+
+export const cities = pgTable("cities", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  stateId: uuid("state_id")
+    .notNull()
+    .references(() => states.id, { onDelete: "cascade" }), // City belongs to a state
+  name: varchar("name", { length: 256 }).notNull(), // e.g., "Los Angeles"
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const citiesRelations = relations(cities, ({ one, many }) => ({
+  state: one(states, {
+    fields: [cities.stateId],
+    references: [states.id],
+  }),
+  parkingAreas: many(parkingAreas), // A city has many parking areas
+  evStations: many(evStations), // A city has many EV stations
+}));

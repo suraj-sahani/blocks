@@ -11,6 +11,14 @@ CREATE TABLE "amenities" (
 	"description" text NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "cities" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"state_id" uuid NOT NULL,
+	"name" varchar(256) NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "ev_charging_slots" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"ev_station_id" uuid NOT NULL,
@@ -40,8 +48,7 @@ CREATE TABLE "ev_stations" (
 	"user_id" uuid NOT NULL,
 	"name" varchar(256) NOT NULL,
 	"address" varchar(512) NOT NULL,
-	"city" varchar(256) NOT NULL,
-	"state" varchar(256) NOT NULL,
+	"city_id" uuid NOT NULL,
 	"zip_code" varchar(10) NOT NULL,
 	"latitude" numeric(10, 7),
 	"longitude" numeric(10, 7),
@@ -76,8 +83,7 @@ CREATE TABLE "parking_areas" (
 	"user_id" uuid NOT NULL,
 	"name" varchar(256) NOT NULL,
 	"address" varchar(512) NOT NULL,
-	"city" varchar(256) NOT NULL,
-	"state" varchar(256) NOT NULL,
+	"city_id" uuid NOT NULL,
 	"zip_code" varchar(10) NOT NULL,
 	"latitude" numeric(10, 7),
 	"longitude" numeric(10, 7),
@@ -106,6 +112,16 @@ CREATE TABLE "parking_slots" (
 	"type" "parking_slot_type" DEFAULT 'standard' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "states" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" varchar(256) NOT NULL,
+	"abbreviation" varchar(2) NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "states_name_unique" UNIQUE("name"),
+	CONSTRAINT "states_abbreviation_unique" UNIQUE("abbreviation")
 );
 --> statement-breakpoint
 CREATE TABLE "ev_charging_bookings" (
@@ -208,15 +224,18 @@ CREATE TABLE "users" (
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
+ALTER TABLE "cities" ADD CONSTRAINT "cities_state_id_states_id_fk" FOREIGN KEY ("state_id") REFERENCES "public"."states"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ev_charging_slots" ADD CONSTRAINT "ev_charging_slots_ev_station_id_ev_stations_id_fk" FOREIGN KEY ("ev_station_id") REFERENCES "public"."ev_stations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ev_station_amenities" ADD CONSTRAINT "ev_station_amenities_ev_station_id_ev_stations_id_fk" FOREIGN KEY ("ev_station_id") REFERENCES "public"."ev_stations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ev_station_amenities" ADD CONSTRAINT "ev_station_amenities_amenity_id_amenities_id_fk" FOREIGN KEY ("amenity_id") REFERENCES "public"."amenities"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ev_station_images" ADD CONSTRAINT "ev_station_images_ev_station_id_ev_stations_id_fk" FOREIGN KEY ("ev_station_id") REFERENCES "public"."ev_stations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ev_stations" ADD CONSTRAINT "ev_stations_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ev_stations" ADD CONSTRAINT "ev_stations_city_id_cities_id_fk" FOREIGN KEY ("city_id") REFERENCES "public"."cities"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "parking_area_amenities" ADD CONSTRAINT "parking_area_amenities_parking_area_id_parking_areas_id_fk" FOREIGN KEY ("parking_area_id") REFERENCES "public"."parking_areas"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "parking_area_amenities" ADD CONSTRAINT "parking_area_amenities_amenity_id_amenities_id_fk" FOREIGN KEY ("amenity_id") REFERENCES "public"."amenities"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "parking_area_images" ADD CONSTRAINT "parking_area_images_parking_area_id_parking_areas_id_fk" FOREIGN KEY ("parking_area_id") REFERENCES "public"."parking_areas"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "parking_areas" ADD CONSTRAINT "parking_areas_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "parking_areas" ADD CONSTRAINT "parking_areas_city_id_cities_id_fk" FOREIGN KEY ("city_id") REFERENCES "public"."cities"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "parking_slot_prices" ADD CONSTRAINT "parking_slot_prices_parking_slot_id_parking_slots_id_fk" FOREIGN KEY ("parking_slot_id") REFERENCES "public"."parking_slots"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "parking_slots" ADD CONSTRAINT "parking_slots_parking_area_id_parking_areas_id_fk" FOREIGN KEY ("parking_area_id") REFERENCES "public"."parking_areas"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ev_charging_bookings" ADD CONSTRAINT "ev_charging_bookings_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
