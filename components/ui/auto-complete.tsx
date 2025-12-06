@@ -18,30 +18,46 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { Activity, useState } from "react"
+import { Spinner } from "./spinner"
 
 type Props = {
-  options: { label: string, value: string }[]
+  options: { label: string, value: string, id: string }[]
   placeholder: string
   value: string,
   onSelectOption: (val: string) => void
+  disabled?: boolean
+  loading?: boolean
 }
 
 export function AutoComplete({
-  options, placeholder, value, onSelectOption
+  options,
+  placeholder,
+  value,
+  onSelectOption,
+  disabled = false,
+  loading = false
 }: Props) {
-
+  const [open, setOpen] = useState(false)
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
           role="combobox"
           className="w-full justify-between"
+          disabled={disabled || loading}
         >
           {value
-            ? options.find((option) => option.value === value)?.label
+            ? options.find((option) => option.id === value)?.label
             : placeholder}
-          <ChevronDown className="opacity-50" />
+          <Activity mode={loading ? "hidden" : "visible"}>
+            <ChevronDown className="opacity-50" />
+          </Activity>
+
+          <Activity mode={loading ? "visible" : "hidden"}>
+            <Spinner />
+          </Activity>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0">
@@ -50,12 +66,13 @@ export function AutoComplete({
           <CommandList>
             <CommandEmpty>No option found.</CommandEmpty>
             <CommandGroup>
-              {options.map((option) => (
+              {options.map((option, index) => (
                 <CommandItem
-                  key={option.value}
+                  key={option.value + index}
                   value={option.value}
                   onSelect={(currentValue) => {
                     onSelectOption(currentValue)
+                    setOpen(false)
                   }}
                 >
                   {option.label}

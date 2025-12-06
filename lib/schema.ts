@@ -14,8 +14,8 @@ export const SIGN_IN_SCHEMA = z.object({})
 export const ADD_PARKING_SCHEMA = z.object({
   name: z.string().trim().nonempty({ error: "Name is required." }),
   address: z.string().trim().nonempty({ error: "Name is required" }),
-  city: z.string().nonempty({ error: "City is required." }),
-  state: z.string().nonempty({ error: "State is required." }),
+  city: z.string({ error: "City is required." }).nonempty({ error: "City is required." }),
+  state: z.string({ error: "City is required." }).nonempty({ error: "State is required." }),
   zipcode: z.string().trim().optional(),
   latitude: z.number({ error: "Latitude is required" }),
   longitude: z.number({ error: "Longitude is required" }),

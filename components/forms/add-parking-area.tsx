@@ -20,7 +20,8 @@ type AddParking = z.infer<typeof ADD_PARKING_SCHEMA>;
 export default function AddParkingAreaForm({ states }: Props) {
   const formattedStates = states.map((state) => ({
     label: `${state.name}(${state.abbreviation})`,
-    value: state.name
+    value: state.name,
+    id: state.id
   }))
   const pad = (n: number) => String(n).padStart(2, "0");
   const formatTime = (d?: Date) => {
@@ -57,10 +58,10 @@ export default function AddParkingAreaForm({ states }: Props) {
     },
   });
 
-  const state = useStore(form.store, (state) => state.values.state)
+  const stateID = useStore(form.store, (state) => state.values.state)
 
-  const getCitiesForState = async (state: string): Promise<City[]> => {
-    const res = await fetch(`/api/state/${state}/cities`)
+  const getCitiesForState = async (stateID: string): Promise<City[]> => {
+    const res = await fetch(`/api/state/${stateID}/cities`)
 
     if (!res.ok) throw new Error(`Request failed with status:${res.status}`)
 
@@ -70,11 +71,16 @@ export default function AddParkingAreaForm({ states }: Props) {
   }
 
   const { data, isFetching } = useQuery({
-    queryKey: [state],
-    queryFn: () => getCitiesForState(state), enabled: state ? true : false
+    queryKey: [stateID],
+    queryFn: () => getCitiesForState(stateID),
+    enabled: stateID ? true : false
   })
 
-  console.log(form.state.errors, data);
+  const cityList = data?.map((city) => ({
+    label: city.name,
+    value: city.name,
+    id: city.id
+  })) || []
 
   return (
     <form
@@ -219,6 +225,7 @@ export default function AddParkingAreaForm({ states }: Props) {
             <div className="space-y-1">
               <Label htmlFor={field.name}>{fieldName}</Label>
               <AutoComplete
+                key={field.name}
                 options={formattedStates}
                 placeholder="Select state"
                 value={field.state.value}
@@ -245,13 +252,16 @@ export default function AddParkingAreaForm({ states }: Props) {
             <div className="space-y-1">
               <Label htmlFor={field.name}>{fieldName}</Label>
               <AutoComplete
-                options={formattedStates}
+                key={field.name}
+                options={cityList}
                 placeholder="Select city"
                 value={field.state.value}
+                disabled={isFetching || !stateID}
+                loading={isFetching}
                 onSelectOption={(val) => {
-                  const selectedState = states.find(state => state.name === val)
-                  if (selectedState)
-                    field.handleChange(selectedState?.id)
+                  const selectedCity = cityList.find(city => city.label === val)
+                  if (selectedCity)
+                    field.handleChange(selectedCity.id)
                 }} />
               <FieldInfo field={field} />
             </div>
