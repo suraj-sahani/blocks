@@ -1,7 +1,9 @@
 import AddParkingAreaForm from "@/components/forms/add-parking-area";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { getAllStates } from "@/lib/api/location";
 
-export default function AddParkingAreaPage() {
+export default async function AddParkingAreaPage() {
+  const states = await getAllStates()
   return (
     <section className="h-screen w-full flex items-center justify-center">
       <Card>
@@ -9,7 +11,7 @@ export default function AddParkingAreaPage() {
           Add Parking Area
         </CardHeader>
         <CardContent>
-          <AddParkingAreaForm />
+          <AddParkingAreaForm states={states} />
         </CardContent>
       </Card>
     </section>)

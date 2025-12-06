@@ -8,12 +8,20 @@ import { Input } from "../ui/input";
 import { useForm } from "@tanstack/react-form";
 import { Button } from "../ui/button";
 import AddressSearch from "../address-search";
+import { State } from "@/lib/types";
+import { AutoComplete } from "../ui/auto-complete";
 
+type Props = {
+  states: State[]
+}
 type AddParking = z.infer<typeof ADD_PARKING_SCHEMA>;
 
-export default function AddParkingAreaForm() {
+export default function AddParkingAreaForm({ states }: Props) {
+  const formattedStates = states.map((state) => ({
+    label: `${state.name}(${state.abbreviation})`,
+    value: state.name
+  }))
   const pad = (n: number) => String(n).padStart(2, "0");
-
   const formatTime = (d?: Date) => {
     const date = d ?? new Date();
     return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
@@ -115,9 +123,9 @@ export default function AddParkingAreaForm() {
                 onPlaceSelect={(place) => {
                   const location = place.geometry?.location
                     ? {
-                        lat: place.geometry.location.lat(),
-                        lng: place.geometry.location.lng(),
-                      }
+                      lat: place.geometry.location.lat(),
+                      lng: place.geometry.location.lng(),
+                    }
                     : undefined;
 
                   if (location?.lat)
@@ -192,12 +200,15 @@ export default function AddParkingAreaForm() {
           return (
             <div className="space-y-1">
               <Label htmlFor={field.name}>{fieldName}</Label>
-              <Input
-                name={field.name}
-                type="number"
-                value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.valueAsNumber)}
-              />
+              <AutoComplete
+                options={formattedStates}
+                placeholder="Select state"
+                value={field.state.value}
+                onSelectOption={(val) => {
+                  const selectedState = states.find(state => state.name === val)
+                  if (selectedState)
+                    field.handleChange(selectedState?.id)
+                }} />
               <FieldInfo field={field} />
             </div>
           );
