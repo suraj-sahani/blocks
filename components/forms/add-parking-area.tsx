@@ -5,11 +5,12 @@ import { FieldInfo, useAppForm } from ".";
 import * as z from "zod";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { useForm } from "@tanstack/react-form";
+import { useForm, useStore } from "@tanstack/react-form";
 import { Button } from "../ui/button";
 import AddressSearch from "../address-search";
-import { State } from "@/lib/types";
+import { City, State } from "@/lib/types";
 import { AutoComplete } from "../ui/auto-complete";
+import { useQuery } from "@tanstack/react-query";
 
 type Props = {
   states: State[]
@@ -56,7 +57,24 @@ export default function AddParkingAreaForm({ states }: Props) {
     },
   });
 
-  console.log(form.state.errors);
+  const state = useStore(form.store, (state) => state.values.state)
+
+  const getCitiesForState = async (state: string): Promise<City[]> => {
+    const res = await fetch(`/api/state/${state}/cities`)
+
+    if (!res.ok) throw new Error(`Request failed with status:${res.status}`)
+
+    const data: { success: boolean, data: City[] } = await res.json()
+
+    return data.data
+  }
+
+  const { data, isFetching } = useQuery({
+    queryKey: [state],
+    queryFn: () => getCitiesForState(state), enabled: state ? true : false
+  })
+
+  console.log(form.state.errors, data);
 
   return (
     <form
@@ -226,12 +244,15 @@ export default function AddParkingAreaForm({ states }: Props) {
           return (
             <div className="space-y-1">
               <Label htmlFor={field.name}>{fieldName}</Label>
-              <Input
-                name={field.name}
-                type="number"
-                value={field.state.value || ""}
-                onChange={(e) => field.handleChange(e.target.valueAsNumber)}
-              />
+              <AutoComplete
+                options={formattedStates}
+                placeholder="Select city"
+                value={field.state.value}
+                onSelectOption={(val) => {
+                  const selectedState = states.find(state => state.name === val)
+                  if (selectedState)
+                    field.handleChange(selectedState?.id)
+                }} />
               <FieldInfo field={field} />
             </div>
           );

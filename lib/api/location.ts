@@ -15,14 +15,4 @@ export const getAllStates = async () => {
   }
 }
 
-export const getCitiesForState = async (stateId: string) => {
-  try {
-    const res = await db.select({
-      id: cities.id,
-      name: cities.name
-    }).from(cities).where(eq(states.id, stateId))
-    return res
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to fetch states.")
-  }
-}
+
