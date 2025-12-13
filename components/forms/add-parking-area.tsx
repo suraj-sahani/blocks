@@ -11,18 +11,19 @@ import AddressSearch from "../address-search";
 import { City, State } from "@/lib/types";
 import { AutoComplete } from "../ui/auto-complete";
 import { useQuery } from "@tanstack/react-query";
+import ImageUpload from "../upload";
 
 type Props = {
-  states: State[]
-}
+  states: State[];
+};
 type AddParking = z.infer<typeof ADD_PARKING_SCHEMA>;
 
 export default function AddParkingAreaForm({ states }: Props) {
   const formattedStates = states.map((state) => ({
     label: `${state.name}(${state.abbreviation})`,
     value: state.name,
-    id: state.id
-  }))
+    id: state.id,
+  }));
   const pad = (n: number) => String(n).padStart(2, "0");
   const formatTime = (d?: Date) => {
     const date = d ?? new Date();
@@ -49,6 +50,7 @@ export default function AddParkingAreaForm({ states }: Props) {
       zipcode: "",
       openingTime: new Date(),
       closingTime: new Date(),
+      images: [] as File[],
     } as AddParking,
     validators: {
       onSubmit: ADD_PARKING_SCHEMA,
@@ -58,29 +60,30 @@ export default function AddParkingAreaForm({ states }: Props) {
     },
   });
 
-  const stateID = useStore(form.store, (state) => state.values.state)
+  const stateID = useStore(form.store, (state) => state.values.state);
 
   const getCitiesForState = async (stateID: string): Promise<City[]> => {
-    const res = await fetch(`/api/state/${stateID}/cities`)
+    const res = await fetch(`/api/state/${stateID}/cities`);
 
-    if (!res.ok) throw new Error(`Request failed with status:${res.status}`)
+    if (!res.ok) throw new Error(`Request failed with status:${res.status}`);
 
-    const data: { success: boolean, data: City[] } = await res.json()
+    const data: { success: boolean; data: City[] } = await res.json();
 
-    return data.data
-  }
+    return data.data;
+  };
 
   const { data, isFetching } = useQuery({
     queryKey: [stateID],
     queryFn: () => getCitiesForState(stateID),
-    enabled: stateID ? true : false
-  })
+    enabled: stateID ? true : false,
+  });
 
-  const cityList = data?.map((city) => ({
-    label: city.name,
-    value: city.name,
-    id: city.id
-  })) || []
+  const cityList =
+    data?.map((city) => ({
+      label: city.name,
+      value: city.name,
+      id: city.id,
+    })) || [];
 
   return (
     <form
@@ -147,9 +150,9 @@ export default function AddParkingAreaForm({ states }: Props) {
                 onPlaceSelect={(place) => {
                   const location = place.geometry?.location
                     ? {
-                      lat: place.geometry.location.lat(),
-                      lng: place.geometry.location.lng(),
-                    }
+                        lat: place.geometry.location.lat(),
+                        lng: place.geometry.location.lng(),
+                      }
                     : undefined;
 
                   if (location?.lat)
@@ -230,10 +233,12 @@ export default function AddParkingAreaForm({ states }: Props) {
                 placeholder="Select state"
                 value={field.state.value}
                 onSelectOption={(val) => {
-                  const selectedState = states.find(state => state.name === val)
-                  if (selectedState)
-                    field.handleChange(selectedState?.id)
-                }} />
+                  const selectedState = states.find(
+                    (state) => state.name === val
+                  );
+                  if (selectedState) field.handleChange(selectedState?.id);
+                }}
+              />
               <FieldInfo field={field} />
             </div>
           );
@@ -259,10 +264,12 @@ export default function AddParkingAreaForm({ states }: Props) {
                 disabled={isFetching || !stateID}
                 loading={isFetching}
                 onSelectOption={(val) => {
-                  const selectedCity = cityList.find(city => city.label === val)
-                  if (selectedCity)
-                    field.handleChange(selectedCity.id)
-                }} />
+                  const selectedCity = cityList.find(
+                    (city) => city.label === val
+                  );
+                  if (selectedCity) field.handleChange(selectedCity.id);
+                }}
+              />
               <FieldInfo field={field} />
             </div>
           );
@@ -338,6 +345,19 @@ export default function AddParkingAreaForm({ states }: Props) {
             </div>
           );
         }}
+      />
+
+      <form.Field
+        name="images"
+        children={(field) => (
+          <div className="col-span-2">
+            <ImageUpload
+              multiple
+              onChange={(e) => field.handleChange(e)}
+              value={field.state.value || []}
+            />
+          </div>
+        )}
       />
 
       <form.Subscribe
