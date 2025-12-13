@@ -1,10 +1,9 @@
+"use client";
 
-"use client"
+import { Check, ChevronDown } from "lucide-react";
 
-import { Check, ChevronDown, } from "lucide-react"
-
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -12,23 +11,23 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Activity, useState } from "react"
-import { Spinner } from "./spinner"
+} from "@/components/ui/popover";
+import { Activity, useState } from "react";
+import { Spinner } from "./spinner";
 
 type Props = {
-  options: { label: string, value: string, id: string }[]
-  placeholder: string
-  value: string,
-  onSelectOption: (val: string) => void
-  disabled?: boolean
-  loading?: boolean
-}
+  options: { label: string; value: string; id: string }[];
+  placeholder: string;
+  value: string;
+  onSelectOption: (val: string) => void;
+  disabled?: boolean;
+  loading?: boolean;
+};
 
 export function AutoComplete({
   options,
@@ -36,9 +35,9 @@ export function AutoComplete({
   value,
   onSelectOption,
   disabled = false,
-  loading = false
+  loading = false,
 }: Props) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -48,7 +47,7 @@ export function AutoComplete({
           className="w-full justify-between"
           disabled={disabled || loading}
         >
-          {value
+          {value && options.find((option) => option.id === value)?.label
             ? options.find((option) => option.id === value)?.label
             : placeholder}
           <Activity mode={loading ? "hidden" : "visible"}>
@@ -71,8 +70,8 @@ export function AutoComplete({
                   key={option.value + index}
                   value={option.value}
                   onSelect={(currentValue) => {
-                    onSelectOption(currentValue)
-                    setOpen(false)
+                    onSelectOption(currentValue);
+                    setOpen(false);
                   }}
                 >
                   {option.label}
@@ -89,5 +88,5 @@ export function AutoComplete({
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 }

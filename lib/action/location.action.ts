@@ -5,24 +5,46 @@ import { AddParkingAreaSchema } from "../types";
 import { parkingAreaImages, parkingAreas } from "@/drizzle/schema";
 import { imageKitAuthenticator } from "../imagekit";
 import { upload } from "@imagekit/next";
+import { DrizzleError, DrizzleQueryError } from "drizzle-orm";
+import { errorHandler } from "../utils";
 
 export const addParkingArea = async (data: AddParkingAreaSchema) => {
   try {
     const dataClone = structuredClone(data);
     const abortController = new AbortController();
+    const {
+      address,
+      city,
+      description,
+      name,
+      zipcode,
+      closingTime,
+      openingTime,
+      latitude,
+      longitude,
+      totalSlots,
+    } = dataClone;
 
     const formattedData = {
-      address: dataClone.address,
-      cityId: dataClone.city,
-      description: dataClone.description,
-      name: dataClone.name,
-      userId: "",
-      zipCode: dataClone.zipcode || "",
-      closingTime: dataClone.closingTime.toISOString(),
-      openingTime: dataClone.openingTime.toISOString(),
-      latitude: dataClone.latitude.toString(),
-      longitude: dataClone.longitude.toString(),
-      totalSlots: dataClone.totalSlots,
+      address: address,
+      cityId: city,
+      description: description,
+      name: name,
+      userId: "7472cba2-6037-488f-b5aa-53b1c39fe450",
+      zipCode: zipcode || "",
+      closingTime: new Date(closingTime).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }),
+      openingTime: new Date(openingTime).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }),
+      latitude: latitude.toString(),
+      longitude: longitude.toString(),
+      totalSlots: totalSlots,
     };
 
     const res = await db.insert(parkingAreas).values(formattedData).returning();
@@ -66,10 +88,10 @@ export const addParkingArea = async (data: AddParkingAreaSchema) => {
       data: { ...res[0], parking_area_images: uploadedImages },
     };
   } catch (error) {
+    const errMsg = errorHandler(error, "Failed to add parking area.");
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : "Failed to add parking area.",
+      message: errMsg,
     };
   }
 };

@@ -2,8 +2,9 @@
 
 import { ADD_PARKING_SCHEMA } from "@/lib/schema";
 import { AddParkingAreaSchema, City, State } from "@/lib/types";
+import { formatTime, parseTime } from "@/lib/utils";
 import { useForm, useStore } from "@tanstack/react-form";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { FieldInfo } from ".";
 import AddressSearch from "../address-search";
 import { AutoComplete } from "../ui/auto-complete";
@@ -11,35 +12,15 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import ImageUpload from "../upload";
+import { addParkingArea } from "@/lib/action/location.action";
+import toast from "react-hot-toast";
+import { Spinner } from "../ui/spinner";
 
 type Props = {
   states: State[];
 };
 
 export default function AddParkingAreaForm({ states }: Props) {
-  const formattedStates = states.map((state) => ({
-    label: `${state.name}(${state.abbreviation})`,
-    value: state.name,
-    id: state.id,
-  }));
-  const pad = (n: number) => String(n).padStart(2, "0");
-  const formatTime = (d?: Date) => {
-    const date = d ?? new Date();
-    return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
-      date.getSeconds()
-    )}`;
-  };
-
-  const parseTime = (timeStr: string) => {
-    const parts = timeStr.split(":").map((p) => Number(p));
-    const now = new Date();
-    const h = parts[0] ?? 0;
-    const m = parts[1] ?? 0;
-    const s = parts[2] ?? 0;
-    now.setHours(h, m, s, 0);
-    return now;
-  };
-
   const form = useForm({
     defaultValues: {
       name: "",
@@ -54,7 +35,7 @@ export default function AddParkingAreaForm({ states }: Props) {
       onSubmit: ADD_PARKING_SCHEMA,
     },
     onSubmit: ({ value }) => {
-      console.log(value);
+      mutate(value);
     },
   });
 
@@ -76,12 +57,31 @@ export default function AddParkingAreaForm({ states }: Props) {
     enabled: stateID ? true : false,
   });
 
+  const { mutate } = useMutation({
+    mutationFn: (data: AddParkingAreaSchema) => addParkingArea(data),
+    onSuccess: ({ success, message, data }) => {
+      if (success) {
+        console.log(data);
+        toast.success(message);
+        form.reset();
+      } else {
+        toast.error(message);
+      }
+    },
+  });
+
   const cityList =
     data?.map((city) => ({
       label: city.name,
       value: city.name,
       id: city.id,
     })) || [];
+
+  const formattedStates = states.map((state) => ({
+    label: `${state.name}(${state.abbreviation})`,
+    value: state.name,
+    id: state.id,
+  }));
 
   return (
     <form
@@ -397,7 +397,7 @@ export default function AddParkingAreaForm({ states }: Props) {
         children={([canSubmit, isSubmitting]) => (
           <div className="col-span-2 flex items-center justify-end">
             <Button type="submit" variant={"default"} disabled={!canSubmit}>
-              {isSubmitting ? "..." : "Submit"}
+              {isSubmitting ? <Spinner /> : "Submit"}
             </Button>
           </div>
         )}
