@@ -12,9 +12,13 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import ImageUpload from "../upload";
-import { addParkingArea } from "@/lib/action/location.action";
+import {
+  addParkingArea,
+  addParkingAreaImages,
+} from "@/lib/action/location.action";
 import toast from "react-hot-toast";
 import { Spinner } from "../ui/spinner";
+import { uploadImageToImageKit } from "@/lib/imagekit";
 
 type Props = {
   states: State[];
@@ -57,8 +61,67 @@ export default function AddParkingAreaForm({ states }: Props) {
     enabled: stateID ? true : false,
   });
 
-  const { mutate } = useMutation({
-    mutationFn: (data: AddParkingAreaSchema) => addParkingArea(data),
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (schema: AddParkingAreaSchema) => {
+      const {
+        success: isParkingAreaSuccess,
+        data: parkingArea,
+        message: parkingAreaMessage,
+      } = await addParkingArea(schema);
+
+      if (!isParkingAreaSuccess || !parkingArea) {
+        return {
+          success: false,
+          message: parkingAreaMessage,
+        };
+      }
+
+      if (Array.isArray(schema.images) && schema.images.length > 0) {
+        const {
+          success: imageUploadSuccess,
+          data: uploadedImages,
+          message: uploadImageMessage,
+        } = await uploadImageToImageKit(schema.images, "/blocks/parking_areas");
+
+        if (!imageUploadSuccess || !uploadedImages) {
+          return {
+            success: false,
+            message: uploadImageMessage,
+          };
+        }
+
+        const {
+          success: isParkingAreaImageSuccess,
+          message: parkingAreaImageMessage,
+          data: parkingAreaImages,
+        } = await addParkingAreaImages(
+          JSON.stringify(uploadedImages),
+          parkingArea.id
+        );
+
+        if (!isParkingAreaImageSuccess || !parkingAreaImages) {
+          return {
+            success: false,
+            message: parkingAreaImageMessage,
+          };
+        }
+
+        return {
+          success: true,
+          message: "Parking area added successfully.",
+          data: {
+            ...parkingArea,
+            images: parkingAreaImages,
+          },
+        };
+      }
+
+      return {
+        success: true,
+        message: "Parking area added successfully.",
+        data: parkingArea,
+      };
+    },
     onSuccess: ({ success, message, data }) => {
       if (success) {
         console.log(data);
@@ -396,8 +459,12 @@ export default function AddParkingAreaForm({ states }: Props) {
         selector={(state) => [state.canSubmit, state.isSubmitting]}
         children={([canSubmit, isSubmitting]) => (
           <div className="col-span-2 flex items-center justify-end">
-            <Button type="submit" variant={"default"} disabled={!canSubmit}>
-              {isSubmitting ? <Spinner /> : "Submit"}
+            <Button
+              type="submit"
+              variant={"default"}
+              disabled={!canSubmit || isSubmitting || isPending}
+            >
+              {isSubmitting || isPending ? <Spinner /> : "Submit"}
             </Button>
           </div>
         )}

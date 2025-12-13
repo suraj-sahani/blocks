@@ -24,6 +24,7 @@ export const ENV_SCHEMA = z.object({
     .string()
     .nonempty({ error: "IMAGEKIT_PRIVATE_KEY is required." }),
   NEXT_PUBLIC_IMAGEKIT_URL: z.string().nonempty("IMAGEKIT_URL is required."),
+  NEXT_PUBLIC_SERVER_URL: z.string().nonempty("SERVER_URL is required."),
 });
 
 export const SIGN_IN_SCHEMA = z.object({});

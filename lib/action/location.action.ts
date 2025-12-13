@@ -1,12 +1,11 @@
 "use server";
 
 import { db } from "@/drizzle/db";
-import { AddParkingAreaSchema } from "../types";
 import { parkingAreaImages, parkingAreas } from "@/drizzle/schema";
 import { imageKitAuthenticator } from "../imagekit";
-import { upload } from "@imagekit/next";
-import { DrizzleError, DrizzleQueryError } from "drizzle-orm";
+import { AddParkingAreaSchema } from "../types";
 import { errorHandler } from "../utils";
+import { upload, UploadResponse } from "@imagekit/next";
 
 export const addParkingArea = async (data: AddParkingAreaSchema) => {
   try {
@@ -23,6 +22,7 @@ export const addParkingArea = async (data: AddParkingAreaSchema) => {
       latitude,
       longitude,
       totalSlots,
+      images,
     } = dataClone;
 
     const formattedData = {
@@ -49,46 +49,46 @@ export const addParkingArea = async (data: AddParkingAreaSchema) => {
 
     const res = await db.insert(parkingAreas).values(formattedData).returning();
 
-    const { images } = dataClone;
-    const uploadedImages = [];
-    if (Array.isArray(images) && images.length > 0) {
-      // Upload Images of ImageKit
-      const { token, signature, expire, publicKey } =
-        await imageKitAuthenticator();
+    return {
+      success: true,
+      message: "Parking area added successfully.",
+      data: { ...res[0] },
+    };
+  } catch (error) {
+    const errMsg = errorHandler(error, "Failed to add parking area.");
+    return {
+      success: false,
+      message: errMsg,
+    };
+  }
+};
 
-      // Upload Images one at a time
-      for (const image of images) {
-        const uploadedImage = await upload({
-          expire,
-          token,
-          signature,
-          publicKey,
-          file: image,
-          fileName: image.name,
-          folder: "/Blocks/Parking Areas",
-          abortSignal: abortController.signal,
-        });
+export const addParkingAreaImages = async (
+  images: string,
+  parkingAreaId: string
+) => {
+  try {
+    const uploadedImages = [],
+      parsedImages: UploadResponse[] = JSON.parse(images);
+    for (const image of parsedImages) {
+      const res = await db
+        .insert(parkingAreaImages)
+        .values({
+          parkingAreaId,
+          url: image.url || "",
+        })
+        .returning();
 
-        // Once image is uploaded, insert into database
-        const imageRes = await db
-          .insert(parkingAreaImages)
-          .values({
-            parkingAreaId: res[0].id,
-            url: uploadedImage.url || "",
-          })
-          .returning();
-
-        uploadedImages.push(...imageRes);
-      }
+      uploadedImages.push(res[0]);
     }
 
     return {
       success: true,
-      message: "Parking area added successfully.",
-      data: { ...res[0], parking_area_images: uploadedImages },
+      message: "Images added successfully.",
+      data: uploadedImages,
     };
   } catch (error) {
-    const errMsg = errorHandler(error, "Failed to add parking area.");
+    const errMsg = errorHandler(error, "Failed to add parking area images.");
     return {
       success: false,
       message: errMsg,
