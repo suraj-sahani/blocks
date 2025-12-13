@@ -1,22 +1,20 @@
 "use client";
 
 import { ADD_PARKING_SCHEMA } from "@/lib/schema";
-import { FieldInfo, useAppForm } from ".";
-import * as z from "zod";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
+import { AddParkingAreaSchema, City, State } from "@/lib/types";
 import { useForm, useStore } from "@tanstack/react-form";
-import { Button } from "../ui/button";
-import AddressSearch from "../address-search";
-import { City, State } from "@/lib/types";
-import { AutoComplete } from "../ui/auto-complete";
 import { useQuery } from "@tanstack/react-query";
+import { FieldInfo } from ".";
+import AddressSearch from "../address-search";
+import { AutoComplete } from "../ui/auto-complete";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 import ImageUpload from "../upload";
 
 type Props = {
   states: State[];
 };
-type AddParking = z.infer<typeof ADD_PARKING_SCHEMA>;
 
 export default function AddParkingAreaForm({ states }: Props) {
   const formattedStates = states.map((state) => ({
@@ -51,7 +49,7 @@ export default function AddParkingAreaForm({ states }: Props) {
       openingTime: new Date(),
       closingTime: new Date(),
       images: [] as File[],
-    } as AddParking,
+    } as AddParkingAreaSchema,
     validators: {
       onSubmit: ADD_PARKING_SCHEMA,
     },
@@ -148,10 +146,12 @@ export default function AddParkingAreaForm({ states }: Props) {
                 onSearchChange={(e) => field.handleChange(e)}
                 value={field.state.value}
                 onPlaceSelect={(place) => {
-                  const location = place.geometry?.location
+                  const { geometry, address_components } = place;
+
+                  const location = geometry?.location
                     ? {
-                        lat: place.geometry.location.lat(),
-                        lng: place.geometry.location.lng(),
+                        lat: geometry.location.lat(),
+                        lng: geometry.location.lng(),
                       }
                     : undefined;
 
@@ -160,9 +160,18 @@ export default function AddParkingAreaForm({ states }: Props) {
                   if (location?.lng)
                     form.setFieldValue("longitude", location.lng);
 
+                  if (address_components) {
+                    for (const comp of address_components) {
+                      if (comp.types.includes("postal_code"))
+                        form.setFieldValue(
+                          "zipcode",
+                          comp.long_name || comp.short_name
+                        );
+                    }
+                  }
+
                   const address = place.formatted_address;
                   if (address) field.handleChange(address || "");
-                  console.log({ location, address, avl: field.state.value });
                 }}
               />
               <FieldInfo field={field} />
@@ -269,6 +278,29 @@ export default function AddParkingAreaForm({ states }: Props) {
                   );
                   if (selectedCity) field.handleChange(selectedCity.id);
                 }}
+              />
+              <FieldInfo field={field} />
+            </div>
+          );
+        }}
+      />
+
+      <form.Field
+        name="zipcode"
+        children={(field) => {
+          const fieldName = field.name
+            .charAt(0)
+            .toLocaleUpperCase()
+            .concat(field.name.slice(1));
+
+          return (
+            <div className="space-y-1">
+              <Label htmlFor={field.name}>{fieldName}</Label>
+              <Input
+                name={field.name}
+                type="text"
+                value={field.state.value || ""}
+                onChange={(e) => field.handleChange(e.target.value)}
               />
               <FieldInfo field={field} />
             </div>
