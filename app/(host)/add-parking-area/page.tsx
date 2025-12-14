@@ -1,4 +1,4 @@
-import AddParkingAreaForm from "@/components/forms/add-parking-area";
+import AddParkingAreaForm from "@/components/forms/add-parking-area-form";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getAllStates } from "@/lib/dal/location";
 

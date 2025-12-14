@@ -47,8 +47,8 @@ export const evStations = pgTable("ev_stations", {
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  name: varchar("name", { length: 256 }).notNull(), // Name of the EV charging station
-  address: varchar("address", { length: 512 }).notNull(), // Full address
+  name: varchar("name", { length: 256 }).notNull(),
+  address: varchar("address", { length: 512 }).notNull(),
   cityId: uuid("city_id")
     .notNull()
     .references(() => cities.id),
@@ -56,14 +56,9 @@ export const evStations = pgTable("ev_stations", {
   latitude: decimal("latitude", { precision: 10, scale: 7 }),
   longitude: decimal("longitude", { precision: 10, scale: 7 }),
   description: varchar("description", { length: 1024 }),
-  connectorType: evConnectorTypeEnum("connector_type").notNull(),
-  chargingLevel: evChargingLevelEnum("charging_level").notNull(),
-  maxPowerKw: decimal("max_power_kw", { precision: 5, scale: 2 }).notNull(),
-  pricePerKwh: decimal("price_per_kwh", { precision: 10, scale: 3 }).notNull(), // NEW: Price per kilowatt-hour
-  totalConnectors: smallint("total_connectors").notNull().default(1), // How many physical charging points at this station
-  availableConnectors: smallint("available_connectors").notNull().default(0), // Real-time availability (can be managed via application logic or triggers)
-  openingTime: varchar("opening_time", { length: 5 }), // Optional operating hours
-  closingTime: varchar("closing_time", { length: 5 }), // Optional operating hours
+  totalConnectors: smallint("total_connectors").notNull().default(1),
+  openingTime: varchar("opening_time", { length: 5 }),
+  closingTime: varchar("closing_time", { length: 5 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

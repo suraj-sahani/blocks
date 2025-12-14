@@ -19,6 +19,7 @@ import {
 import toast from "react-hot-toast";
 import { Spinner } from "../ui/spinner";
 import { uploadImageToImageKit } from "@/lib/imagekit";
+import { IMAGEKIT_FOLDERS } from "@/lib/constants";
 
 type Props = {
   states: State[];
@@ -81,7 +82,10 @@ export default function AddParkingAreaForm({ states }: Props) {
           success: imageUploadSuccess,
           data: uploadedImages,
           message: uploadImageMessage,
-        } = await uploadImageToImageKit(schema.images, "/blocks/parking_areas");
+        } = await uploadImageToImageKit(
+          schema.images,
+          IMAGEKIT_FOLDERS.parking
+        );
 
         if (!imageUploadSuccess || !uploadedImages) {
           return {
