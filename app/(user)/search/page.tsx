@@ -1,24 +1,8 @@
 "use client";
-import { useState } from "react";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Search as SearchIcon,
-  MapPin,
-  Calendar,
-  Clock,
-  Car,
-  Zap,
-  Star,
-  Filter,
-  ChevronDown,
-  Navigation,
-  Battery,
-  ParkingCircle,
-} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -26,8 +10,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { motion } from "framer-motion";
+import {
+  Battery,
+  Calendar,
+  Car,
+  Clock,
+  Filter,
+  MapPin,
+  Navigation,
+  ParkingCircle,
+  Search as SearchIcon,
+  Star,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
-import { Navbar } from "@/components/navbar";
+import { useState } from "react";
 
 const mockLocations = [
   {
@@ -142,8 +140,7 @@ const SearchPage = () => {
   });
 
   return (
-    <section className="min-h-screen flex flex-col">
-      <Navbar />
+    <>
       <div className="pt-20 min-h-screen">
         {/* Search Bar */}
         <div className="bg-card border-b border-border sticky top-16 lg:top-20 z-30">
@@ -429,7 +426,7 @@ const SearchPage = () => {
           )}
         </div>
       </div>
-    </section>
+    </>
   );
 };
 
