@@ -11,6 +11,7 @@ import { imageKitAuthenticator } from "../imagekit";
 import { AddEVSchema, AddParkingAreaSchema } from "../types";
 import { errorHandler } from "../utils";
 import { upload, UploadResponse } from "@imagekit/next";
+import { eq, or } from "drizzle-orm";
 
 export const addParkingArea = async (data: AddParkingAreaSchema) => {
   try {
@@ -51,6 +52,24 @@ export const addParkingArea = async (data: AddParkingAreaSchema) => {
       longitude: longitude.toString(),
       totalSlots: totalSlots,
     };
+
+    const existingParkingArea = await db
+      .select()
+      .from(parkingAreas)
+      .where(
+        or(
+          eq(evStations.address, address),
+          eq(evStations.latitude, latitude.toString()),
+          eq(evStations.longitude, longitude.toString())
+        )
+      );
+
+    if (existingParkingArea.length > 0) {
+      return {
+        success: false,
+        message: "Parking area already exists.",
+      };
+    }
 
     const res = await db.insert(parkingAreas).values(formattedData).returning();
 
@@ -140,6 +159,24 @@ export const addEVStation = async (data: AddEVSchema) => {
       longitude: longitude.toString(),
       totalConnectors,
     };
+
+    const existingEVStation = await db
+      .select()
+      .from(evStations)
+      .where(
+        or(
+          eq(evStations.address, address),
+          eq(evStations.latitude, latitude.toString()),
+          eq(evStations.longitude, longitude.toString())
+        )
+      );
+
+    if (existingEVStation.length > 0) {
+      return {
+        success: false,
+        message: "EV Station already exists.",
+      };
+    }
 
     const res = await db.insert(evStations).values(formattedData).returning();
 
