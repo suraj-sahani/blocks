@@ -107,7 +107,7 @@ export const Navbar = () => {
                 EV Charging
               </Link>
               <Link
-                href="/host/dashboard"
+                href="/dashboard"
                 className="px-4 py-2 text-foreground/70 hover:text-foreground transition-colors font-medium"
                 onClick={() => setIsMenuOpen(false)}
               >
