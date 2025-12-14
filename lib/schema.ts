@@ -49,3 +49,24 @@ export const ADD_PARKING_SCHEMA = z.object({
   closingTime: z.date({ error: "Closing time is required." }),
   images: z.array(z.file()).optional(),
 });
+
+export const ADD_EV_SCHEMA = z.object({
+  name: z.string().trim().nonempty({ error: "Name is required." }),
+  address: z.string().trim().nonempty({ error: "Name is required" }),
+  city: z
+    .string({ error: "City is required." })
+    .nonempty({ error: "City is required." }),
+  state: z
+    .string({ error: "City is required." })
+    .nonempty({ error: "State is required." }),
+  zipcode: z.string().trim().optional(),
+  latitude: z.number({ error: "Latitude is required" }),
+  longitude: z.number({ error: "Longitude is required" }),
+  description: z.string().trim().optional(),
+  openingTime: z.date({ error: "Opening Time is required." }),
+  closingTime: z.date({ error: "Closing time is required." }),
+  images: z.array(z.file()).optional(),
+  totalConnectors: z
+    .number({ error: "Total connectors is required." })
+    .min(1, { error: "Total connectors must be a minimun of 1" }),
+});

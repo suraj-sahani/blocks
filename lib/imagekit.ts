@@ -39,10 +39,11 @@ export const uploadImageToImageKit = async (
 ) => {
   try {
     const uploadedImages: UploadResponse[] = [];
-    const { expire, publicKey, signature, token } =
-      await imageKitAuthenticator();
 
     for (const file of files) {
+      // Generate a new token every time
+      const { expire, publicKey, signature, token } =
+        await imageKitAuthenticator();
       const uploadedImage = await upload({
         file,
         fileName: file.name,

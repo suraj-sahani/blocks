@@ -1,25 +1,25 @@
 "use client";
 
+import {
+  addParkingArea,
+  addParkingAreaImages,
+} from "@/lib/action/location.action";
+import { IMAGEKIT_FOLDERS } from "@/lib/constants";
+import { uploadImageToImageKit } from "@/lib/imagekit";
 import { ADD_PARKING_SCHEMA } from "@/lib/schema";
 import { AddParkingAreaSchema, City, State } from "@/lib/types";
 import { formatTime, parseTime } from "@/lib/utils";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { FieldInfo } from ".";
 import AddressSearch from "../address-search";
 import { AutoComplete } from "../ui/auto-complete";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import ImageUpload from "../upload";
-import {
-  addParkingArea,
-  addParkingAreaImages,
-} from "@/lib/action/location.action";
-import toast from "react-hot-toast";
 import { Spinner } from "../ui/spinner";
-import { uploadImageToImageKit } from "@/lib/imagekit";
-import { IMAGEKIT_FOLDERS } from "@/lib/constants";
+import ImageUpload from "../upload";
 
 type Props = {
   states: State[];
