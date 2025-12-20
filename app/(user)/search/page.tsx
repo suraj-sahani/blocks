@@ -13,7 +13,7 @@ export default async function SearchPage({ searchParams }: Props) {
   const { showMap, spotType, address } = await loadBookingSearchParams(
     searchParams
   );
-
+  // console.log("Server Params:", { showMap, spotType, address });
   const filteredLocations = mockLocations.filter((loc) => {
     if (spotType === "all") return true;
     return loc.type === spotType;

@@ -104,3 +104,84 @@ export const mockLocations = [
   },
 ] as const;
 
+export const bookings = [
+  {
+    id: 1,
+    user: "Sarah Mitchell",
+    location: "Spot A1 - Downtown Garage",
+    type: "parking",
+    date: "Dec 15, 2024",
+    time: "9:00 AM - 5:00 PM",
+    amount: "$40",
+    status: "Confirmed",
+  },
+  {
+    id: 2,
+    user: "Michael Chen",
+    location: "EV Station 2",
+    type: "ev",
+    date: "Dec 15, 2024",
+    time: "2:00 PM - 4:00 PM",
+    amount: "$18",
+    status: "Active",
+  },
+  {
+    id: 3,
+    user: "Emily Rodriguez",
+    location: "Spot B3 - Central Plaza",
+    type: "parking",
+    date: "Dec 14, 2024",
+    time: "8:00 AM - 6:00 PM",
+    amount: "$50",
+    status: "Completed",
+  },
+  {
+    id: 4,
+    user: "David Kim",
+    location: "EV Station 1",
+    type: "ev",
+    date: "Dec 14, 2024",
+    time: "10:00 AM - 12:00 PM",
+    amount: "$12",
+    status: "Completed",
+  },
+];
+
+export const listings = [
+  {
+    id: 1,
+    name: "Downtown Parking Garage - Spot A1",
+    type: "parking",
+    address: "123 Main Street",
+    price: "$5/hr",
+    rating: 4.8,
+    bookings: 156,
+    status: "Active",
+    image:
+      "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=200&h=150&fit=crop",
+  },
+  {
+    id: 2,
+    name: "EV Supercharger Station 1",
+    type: "ev",
+    address: "456 Electric Ave",
+    price: "$0.35/kWh",
+    rating: 4.9,
+    bookings: 89,
+    status: "Active",
+    image:
+      "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=200&h=150&fit=crop",
+  },
+  {
+    id: 3,
+    name: "Central Plaza - Spot B3",
+    type: "parking",
+    address: "789 Plaza Way",
+    price: "$4/hr",
+    rating: 4.6,
+    bookings: 203,
+    status: "Active",
+    image:
+      "https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?w=200&h=150&fit=crop",
+  },
+];

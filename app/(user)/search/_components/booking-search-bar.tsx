@@ -19,11 +19,13 @@ import {
   SearchIcon,
 } from "lucide-react";
 import {
+  parseAsBoolean,
   parseAsIsoDate,
   parseAsString,
   parseAsStringLiteral,
   useQueryState,
 } from "nuqs";
+import { spotTypes, vehicleTypes } from "./booking-search-params";
 
 type Props = {
   showMap: boolean;
@@ -33,7 +35,13 @@ type Props = {
 const BookingSearchBar = ({ showMap, spotType }: Props) => {
   const [address, setAddress] = useQueryState(
     "address",
-    parseAsString.withDefault("")
+    parseAsString.withDefault("").withOptions({
+      shallow: false,
+      limitUrlUpdates: {
+        method: "debounce",
+        timeMs: 500,
+      },
+    })
   );
   const [checkIn, setCheckIn] = useQueryState(
     "checkIn",
@@ -45,14 +53,22 @@ const BookingSearchBar = ({ showMap, spotType }: Props) => {
   );
   const [vehicleType, setVehicleType] = useQueryState(
     "vehicleType",
-    parseAsStringLiteral([
-      "sedan",
-      "suv",
-      "motorcycle",
-      "truck",
-      "ev",
-    ]).withDefault("sedan")
+    parseAsStringLiteral(vehicleTypes).withDefault("sedan")
   );
+  const [clientSpotTYpe, setClientSpotType] = useQueryState(
+    "type",
+    parseAsStringLiteral(spotTypes).withDefault(spotType).withOptions({
+      shallow: false,
+    })
+  );
+  const [showMapClient, setShowMapClient] = useQueryState(
+    "showMap",
+    parseAsBoolean.withDefault(showMap).withOptions({
+      shallow: false,
+    })
+  );
+
+  // console.log("Client Params:", { showMap, clientSpotTYpe, address });
 
   return (
     <div className="bg-card border-b border-border sticky top-16 lg:top-20 z-30">
@@ -139,9 +155,9 @@ const BookingSearchBar = ({ showMap, spotType }: Props) => {
         <div className="flex items-center gap-3 mt-4">
           <div className="flex items-center gap-2 bg-muted rounded-full p-1">
             <button
-              // onClick={() => setSpotType("all")}
+              onClick={() => setClientSpotType("all")}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                spotType === "all"
+                clientSpotTYpe === "all"
                   ? "bg-card shadow-sm text-foreground"
                   : "text-muted-foreground"
               }`}
@@ -149,9 +165,9 @@ const BookingSearchBar = ({ showMap, spotType }: Props) => {
               All
             </button>
             <button
-              // onClick={() => setSpotType("parking")}
+              onClick={() => setClientSpotType("parking")}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
-                spotType === "parking"
+                clientSpotTYpe === "parking"
                   ? "bg-card shadow-sm text-foreground"
                   : "text-muted-foreground"
               }`}
@@ -160,9 +176,9 @@ const BookingSearchBar = ({ showMap, spotType }: Props) => {
               Parking
             </button>
             <button
-              // onClick={() => setSpotType("ev")}
+              onClick={() => setClientSpotType("ev")}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
-                spotType === "ev"
+                clientSpotTYpe === "ev"
                   ? "bg-card shadow-sm text-foreground"
                   : "text-muted-foreground"
               }`}
@@ -180,7 +196,7 @@ const BookingSearchBar = ({ showMap, spotType }: Props) => {
           <Button
             variant="ghost"
             size="sm"
-            // onClick={() => setShowMap(!showMap)}
+            onClick={() => setShowMapClient(!showMap)}
             className="ml-auto"
           >
             {showMap ? "Hide Map" : "Show Map"}

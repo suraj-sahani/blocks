@@ -6,8 +6,14 @@ import {
   parseAsStringLiteral,
 } from "nuqs/server";
 
-const spotTypes = ["all", "parking", "ev"] as const;
-const vehicleTypes = ["sedan", "suv", "truck", "motorcycle", "ev"] as const;
+export const spotTypes = ["all", "parking", "ev"] as const;
+export const vehicleTypes = [
+  "sedan",
+  "suv",
+  "truck",
+  "motorcycle",
+  "ev",
+] as const;
 
 export const bookingSearchParams = {
   address: parseAsString.withDefault(""),
