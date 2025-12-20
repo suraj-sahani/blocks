@@ -54,7 +54,7 @@ export const Navbar = () => {
               EV Charging
             </Link>
             <Link
-              href="/host/dashboard"
+              href="dashboard"
               className="text-foreground/70 hover:text-foreground transition-colors font-medium"
             >
               Become a Host
