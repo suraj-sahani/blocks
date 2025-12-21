@@ -1,6 +1,5 @@
 import { db } from "@/drizzle/db";
-import { cities, states } from "@/drizzle/schema";
-import { eq } from "drizzle-orm";
+import { states } from "@/drizzle/schema";
 import { errorHandler } from "../utils";
 
 export const getAllStates = async () => {
