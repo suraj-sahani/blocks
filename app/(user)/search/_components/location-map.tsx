@@ -11,7 +11,7 @@ type Props = {
 export default function LocationMap({ locations, showMap }: Props) {
   return (
     <Activity mode={showMap ? "visible" : "hidden"}>
-      <div className="w-1/2 bg-muted relative">
+      <div className="md:1/2 lg:w-3/4 bg-muted relative">
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center p-8">
             <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">

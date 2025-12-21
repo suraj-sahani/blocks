@@ -1,3 +1,28 @@
+import {
+  Accessibility,
+  Battery,
+  Bus,
+  CalendarCheck,
+  Car,
+  Cctv,
+  Coffee,
+  ConciergeBell,
+  CreditCard,
+  FastForward,
+  LampCeiling,
+  Luggage,
+  Mailbox,
+  Plug,
+  PlugZap,
+  Shield,
+  ShieldPlus,
+  ShoppingBag,
+  Umbrella,
+  Waves,
+  Wifi,
+  Zap,
+} from "lucide-react";
+
 export const IMAGEKIT_FOLDERS = {
   parking: "/blocks/parking_areas",
   ev: "/blocks/ev_stations",
@@ -11,13 +36,26 @@ export const mockLocations = [
     name: "Downtown Parking Garage",
     address: "123 Main Street, Downtown",
     type: "parking",
+    amenities: [
+      {
+        id: 1,
+        name: "Open Air",
+      },
+      {
+        id: 2,
+        name: "EV Charging",
+      },
+      {
+        id: 3,
+        name: "Valet",
+      },
+    ],
     price: 5,
     priceUnit: "hour",
     rating: 4.8,
     reviews: 234,
     distance: "0.3 mi",
     available: 12,
-    features: ["Covered", "24/7", "Security"],
     image:
       "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=400&h=300&fit=crop",
     coordinates: { lat: 40.7128, lng: -74.006 },
@@ -29,10 +67,25 @@ export const mockLocations = [
     type: "ev",
     price: 0.35,
     priceUnit: "kWh",
+    connectorTypes: ["Type 2", "Type 3"],
     rating: 4.9,
     reviews: 189,
     distance: "0.5 mi",
     available: 4,
+    amenities: [
+      {
+        id: 1,
+        name: "Open Air",
+      },
+      {
+        id: 2,
+        name: "EV Charging",
+      },
+      {
+        id: 3,
+        name: "Valet",
+      },
+    ],
     features: ["Level 3", "150kW", "Covered"],
     image:
       "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=400&h=300&fit=crop",
@@ -43,6 +96,20 @@ export const mockLocations = [
     name: "Central Plaza Parking",
     address: "789 Plaza Way, Central Business",
     type: "parking",
+    amenities: [
+      {
+        id: 1,
+        name: "Open Air",
+      },
+      {
+        id: 2,
+        name: "EV Charging",
+      },
+      {
+        id: 3,
+        name: "Valet",
+      },
+    ],
     price: 4,
     priceUnit: "hour",
     rating: 4.6,
@@ -59,10 +126,25 @@ export const mockLocations = [
     name: "Green Energy Station",
     address: "321 Eco Boulevard, Green District",
     type: "ev",
+    connectorTypes: ["Type 2", "Type 3"],
     price: 0.28,
     priceUnit: "kWh",
     rating: 4.7,
     reviews: 92,
+    amenities: [
+      {
+        id: 1,
+        name: "Open Air",
+      },
+      {
+        id: 2,
+        name: "EV Charging",
+      },
+      {
+        id: 3,
+        name: "Valet",
+      },
+    ],
     distance: "1.2 mi",
     available: 6,
     features: ["Level 2", "Solar Powered", "24/7"],
@@ -76,6 +158,20 @@ export const mockLocations = [
     address: "555 Airport Road, Terminal Area",
     type: "parking",
     price: 15,
+    amenities: [
+      {
+        id: 1,
+        name: "Shuttle",
+      },
+      {
+        id: 2,
+        name: "Covered",
+      },
+      {
+        id: 3,
+        name: "Long-term",
+      },
+    ],
     priceUnit: "day",
     rating: 4.5,
     reviews: 312,
@@ -91,10 +187,25 @@ export const mockLocations = [
     name: "Mall EV Charging Center",
     address: "888 Shopping Center Dr",
     type: "ev",
+    connectorTypes: ["Type 2", "Type 3"],
     price: 0.32,
     priceUnit: "kWh",
     rating: 4.4,
     reviews: 78,
+    amenities: [
+      {
+        id: 1,
+        name: "Open Air",
+      },
+      {
+        id: 2,
+        name: "EV Charging",
+      },
+      {
+        id: 3,
+        name: "Valet",
+      },
+    ],
     distance: "2.1 mi",
     available: 8,
     features: ["Level 2", "Free Parking", "Mall Access"],
@@ -184,4 +295,36 @@ export const listings = [
     image:
       "https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?w=200&h=150&fit=crop",
   },
+];
+
+export const iconMappings = [
+  { name: "Security Camera", icon: Cctv },
+  { name: "24/7 Access", icon: CalendarCheck },
+  { name: "EV Charging", icon: PlugZap },
+  { name: "Covered Parking", icon: Umbrella },
+  { name: "Wheelchair Access", icon: Accessibility },
+  { name: "Public Transport", icon: Bus },
+  { name: "Well Lit", icon: LampCeiling },
+  { name: "Valet Service", icon: ConciergeBell },
+  { name: "Car Wash", icon: Waves },
+  { name: "Mall Access", icon: Mailbox },
+  { name: "Weather Protected", icon: Umbrella },
+  { name: "Shuttle Service", icon: Car },
+  { name: "Security Patrol", icon: ShieldPlus },
+  { name: "Luggage Help", icon: Luggage },
+  { name: "Smart Parking", icon: Car },
+  { name: "WiFi Access", icon: Wifi },
+  { name: "24/7 Security", icon: Shield },
+  { name: "Fast Charging", icon: Zap },
+  { name: "Cafe", icon: Coffee },
+  { name: "Secure Payment", icon: CreditCard },
+  { name: "Shopping Access", icon: ShoppingBag },
+  { name: "Ultra-Fast", icon: FastForward },
+  { name: "Battery Service", icon: Battery },
+  { name: "Multiple Plugs", icon: Plug },
+  { name: "Solar Powered", icon: Zap },
+  { name: "Premium Lounge", icon: Coffee },
+  { name: "Battery Health Check", icon: Battery },
+  { name: "Workspace", icon: Plug },
+  { name: "Secure Access", icon: Shield },
 ];

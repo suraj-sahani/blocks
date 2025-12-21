@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { DrizzleQueryError } from "drizzle-orm";
 import { twMerge } from "tailwind-merge";
 import z, { ZodError } from "zod";
+import { iconMappings } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -23,6 +24,12 @@ export const parseTime = (timeStr: string) => {
   const s = parts[2] ?? 0;
   now.setHours(h, m, s, 0);
   return now;
+};
+
+export const getAmenityIcon = (name: string) => {
+  return iconMappings.find(
+    (mapping) => mapping.name.toLowerCase() === name.toLowerCase()
+  );
 };
 
 export const errorHandler = (error: unknown, message?: string) => {

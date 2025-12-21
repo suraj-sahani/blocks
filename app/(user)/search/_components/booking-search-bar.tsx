@@ -73,9 +73,9 @@ const BookingSearchBar = ({ showMap, spotType }: Props) => {
   return (
     <div className="bg-card border-b border-border sticky top-16 lg:top-20 z-30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex flex-wrap items-end gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 items-end">
           {/* Location Search */}
-          <div className="flex-1 min-w-[200px]">
+          <div>
             <Label className="text-xs text-muted-foreground mb-1 block">
               Location
             </Label>
@@ -91,7 +91,7 @@ const BookingSearchBar = ({ showMap, spotType }: Props) => {
           </div>
 
           {/* Check-in */}
-          <div className="w-40">
+          <div>
             <Label className="text-xs text-muted-foreground mb-1 block">
               Check-in
             </Label>
@@ -107,7 +107,7 @@ const BookingSearchBar = ({ showMap, spotType }: Props) => {
           </div>
 
           {/* Check-out */}
-          <div className="w-40">
+          <div>
             <Label className="text-xs text-muted-foreground mb-1 block">
               Check-out
             </Label>
@@ -123,7 +123,7 @@ const BookingSearchBar = ({ showMap, spotType }: Props) => {
           </div>
 
           {/* Vehicle Type */}
-          <div className="w-36">
+          <div>
             <Label className="text-xs text-muted-foreground mb-1 block">
               Vehicle
             </Label>
@@ -131,7 +131,7 @@ const BookingSearchBar = ({ showMap, spotType }: Props) => {
               value={vehicleType}
               onValueChange={(val: typeof vehicleType) => setVehicleType(val)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>
@@ -145,15 +145,15 @@ const BookingSearchBar = ({ showMap, spotType }: Props) => {
           </div>
 
           {/* Search Button */}
-          <Button variant="hero" size="lg">
-            <SearchIcon className="w-5 h-5 mr-2" />
+          <Button variant="hero" size="sm">
+            <SearchIcon className="mr-2" />
             Search
           </Button>
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-3 mt-4">
-          <div className="flex items-center gap-2 bg-muted rounded-full p-1">
+        <div className="flex flex-wrap items-center gap-3 mt-4">
+          <div className="flex md:flex-none items-center gap-2 bg-muted rounded-full p-1">
             <button
               onClick={() => setClientSpotType("all")}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
@@ -197,7 +197,7 @@ const BookingSearchBar = ({ showMap, spotType }: Props) => {
             variant="ghost"
             size="sm"
             onClick={() => setShowMapClient(!showMap)}
-            className="ml-auto"
+            className="ml-auto bg-gray-100"
           >
             {showMap ? "Hide Map" : "Show Map"}
           </Button>
