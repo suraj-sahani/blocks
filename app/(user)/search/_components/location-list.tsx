@@ -1,9 +1,7 @@
 "use client";
 import SpotCard from "@/components/spot-card";
-import { Card } from "@/components/ui/card";
 import { Location } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { Car, MapPin, Navigation, Star, Zap } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
 

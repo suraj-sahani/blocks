@@ -27,7 +27,21 @@ export const ENV_SCHEMA = z.object({
   NEXT_PUBLIC_SERVER_URL: z.string().nonempty("SERVER_URL is required."),
 });
 
-export const SIGN_IN_SCHEMA = z.object({});
+export const SIGN_IN_SCHEMA = z.object({
+  email: z.email().nonempty({ error: "Email is required." }),
+  password: z.string().nonempty({ error: "Password is required." }),
+});
+
+export const SIGN_UP_SCHEMA = z.object({
+  firstName: z.string().trim().nonempty({ error: "First name is required." }),
+  lastName: z.string().trim().nonempty({ error: "Last name is required." }),
+  email: z.email().nonempty({ error: "Email is required." }),
+  password: z.string().nonempty({ error: "Password is required." }),
+  agreeToTerms: z.boolean({
+    error: "Please agree to our terms and conditions to continue.",
+  }),
+  signUpType: z.enum(["user", "host"], { error: "Sign up type is required." }),
+});
 
 export const ADD_PARKING_SCHEMA = z.object({
   name: z.string().trim().nonempty({ error: "Name is required." }),
