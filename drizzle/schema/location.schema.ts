@@ -39,7 +39,10 @@ export const parkingAreas = pgTable("parking_areas", {
   openingTime: varchar("opening_time", { length: 5 }).notNull(),
   closingTime: varchar("closing_time", { length: 5 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const evStations = pgTable("ev_stations", {
@@ -60,7 +63,10 @@ export const evStations = pgTable("ev_stations", {
   openingTime: varchar("opening_time", { length: 5 }),
   closingTime: varchar("closing_time", { length: 5 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const amenities = pgTable("amenities", {
@@ -165,7 +171,10 @@ export const parkingAreaImages = pgTable("parking_area_images", {
     .references(() => parkingAreas.id, { onDelete: "cascade" }),
   url: varchar("url", { length: 1024 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const parkingAreaImagesRelations = relations(
@@ -185,7 +194,10 @@ export const evStationImages = pgTable("ev_station_images", {
     .references(() => evStations.id, { onDelete: "cascade" }),
   url: varchar("url", { length: 1024 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const evStationImagesRelations = relations(
@@ -208,7 +220,10 @@ export const evChargingSlots = pgTable("ev_charging_slots", {
   chargingLevel: evChargingLevelEnum("charging_level").notNull(),
   maxPowerKw: decimal("max_power_kw", { precision: 5, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const evChargingSlotsRelations = relations(
@@ -232,7 +247,10 @@ export const parkingSlots = pgTable("parking_slots", {
   type: parkingSlotTypeEnum("type").notNull().default("standard"),
   // Removed isAvailable column
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const parkingSlotsRelations = relations(
@@ -258,7 +276,10 @@ export const parkingSlotPrices = pgTable("parking_slot_prices", {
     scale: 2,
   }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const parkingSlotPricesRelations = relations(
@@ -277,7 +298,10 @@ export const states = pgTable("states", {
   abbreviation: varchar("abbreviation", { length: 2 }).unique().notNull(), // e.g., "CA"
   // REMOVED: countryCode: varchar("country_code", { length: 2 }).notNull().default("US"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const statesRelations = relations(states, ({ many }) => ({
@@ -291,7 +315,10 @@ export const cities = pgTable("cities", {
     .references(() => states.id, { onDelete: "cascade" }), // City belongs to a state
   name: varchar("name", { length: 256 }).notNull(), // e.g., "Los Angeles"
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const citiesRelations = relations(cities, ({ one, many }) => ({

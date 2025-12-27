@@ -1,9 +1,23 @@
 import { relations } from "drizzle-orm";
-import { decimal, integer, pgEnum, pgTable, smallint, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
-import { evChargingSlots, evStations, parkingAreas, parkingSlots } from "./location.schema";
+import {
+  decimal,
+  integer,
+  pgEnum,
+  pgTable,
+  smallint,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
+import {
+  evChargingSlots,
+  evStations,
+  parkingAreas,
+  parkingSlots,
+} from "./location.schema";
 import { payments, paymentStatusEnum } from "./payment.schema";
 import { users, userVehicles } from "./user.schema";
-import { evConnectorTypeEnum, vehicleBodyTypeEnum } from "./enum"
+import { evConnectorTypeEnum, vehicleBodyTypeEnum } from "./enum";
 
 export const parkingBookings = pgTable("parking_bookings", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -27,7 +41,10 @@ export const parkingBookings = pgTable("parking_bookings", {
   totalCost: decimal("total_cost", { precision: 10, scale: 2 }), // Calculated based on pricePerHour and duration
   status: varchar("status", { length: 50 }).notNull().default("confirmed"), // Booking status (e.g., 'pending', 'confirmed', 'completed', 'cancelled')
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const evChargingBookings = pgTable("ev_charging_bookings", {
@@ -49,11 +66,17 @@ export const evChargingBookings = pgTable("ev_charging_bookings", {
   endTime: timestamp("end_time"), // Planned end, could be null if "charge until full"
   actualStartTime: timestamp("actual_start_time"), // When charging actually started
   actualEndTime: timestamp("actual_end_time"), // When charging actually ended
-  energyConsumedKwh: decimal("energy_consumed_kwh", { precision: 10, scale: 3 }), // How much energy was consumed
+  energyConsumedKwh: decimal("energy_consumed_kwh", {
+    precision: 10,
+    scale: 3,
+  }), // How much energy was consumed
   totalCost: decimal("total_cost", { precision: 10, scale: 2 }), // Calculated based on pricePerKwh and energyConsumedKwh
   status: varchar("status", { length: 50 }).notNull().default("confirmed"), // Booking status
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const parkingBookingsRelations = relations(
@@ -63,11 +86,13 @@ export const parkingBookingsRelations = relations(
       fields: [parkingBookings.userId],
       references: [users.id],
     }),
-    userVehicle: one(userVehicles, { // NEW RELATION
+    userVehicle: one(userVehicles, {
+      // NEW RELATION
       fields: [parkingBookings.userVehicleId],
       references: [userVehicles.id],
     }),
-    parkingArea: one(parkingAreas, { // NEW RELATION
+    parkingArea: one(parkingAreas, {
+      // NEW RELATION
       fields: [parkingBookings.parkingAreaId],
       references: [parkingAreas.id],
     }),
@@ -86,11 +111,13 @@ export const evChargingBookingsRelations = relations(
       fields: [evChargingBookings.userId],
       references: [users.id],
     }),
-    userVehicle: one(userVehicles, { // NEW RELATION
+    userVehicle: one(userVehicles, {
+      // NEW RELATION
       fields: [evChargingBookings.userVehicleId],
       references: [userVehicles.id],
     }),
-    evStation: one(evStations, { // NEW RELATION
+    evStation: one(evStations, {
+      // NEW RELATION
       fields: [evChargingBookings.evStationId],
       references: [evStations.id],
     }),

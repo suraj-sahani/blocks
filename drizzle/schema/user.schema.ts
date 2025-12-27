@@ -2,6 +2,7 @@ import {
   boolean,
   integer,
   pgTable,
+  text,
   timestamp,
   uuid,
   varchar,
@@ -15,13 +16,16 @@ import { evConnectorTypeEnum, vehicleBodyTypeEnum } from "./enum";
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   email: varchar("email", { length: 256 }).unique().notNull(),
-  password: varchar("password", { length: 256 }), // For email/password logins
-  firstName: varchar("first_name", { length: 256 }),
-  lastName: varchar("last_name", { length: 256 }),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  password: varchar("password", { length: 256 }),
+  name: text("name").notNull(),
   phoneNumber: varchar("phone_number", { length: 20 }),
-  profilePictureUrl: varchar("profile_picture_url", { length: 512 }),
+  image: text("image"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -41,7 +45,10 @@ export const userImages = pgTable("user_images", {
     .references(() => users.id, { onDelete: "cascade" }),
   url: varchar("url", { length: 1024 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const userImagesRelations = relations(userImages, ({ one }) => ({
@@ -67,7 +74,10 @@ export const userVehicles = pgTable("user_vehicles", {
   evPrimaryConnector: evConnectorTypeEnum("ev_primary_connector"), // Null if not EV
   isDefault: boolean("is_default").default(false), // Mark one vehicle as default for quicker booking
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const userVehicleImages = pgTable("user_vehicle_images", {
@@ -77,7 +87,10 @@ export const userVehicleImages = pgTable("user_vehicle_images", {
     .references(() => userVehicles.id, { onDelete: "cascade" }),
   url: varchar("url", { length: 1024 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const userVehicleImagesRelations = relations(

@@ -1,6 +1,6 @@
 "use server";
 
-import { signUp } from "../auth-client";
+import { signUp } from "../auth/client";
 import { logger } from "../pino/server";
 import { SignUpSchema } from "../types";
 
