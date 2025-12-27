@@ -12,6 +12,7 @@ import { AddEVSchema, AddParkingAreaSchema } from "../types";
 import { errorHandler } from "../utils";
 import { upload, UploadResponse } from "@imagekit/next";
 import { eq, or } from "drizzle-orm";
+import { logger } from "../pino/server";
 
 export const addParkingArea = async (data: AddParkingAreaSchema) => {
   try {
@@ -79,6 +80,7 @@ export const addParkingArea = async (data: AddParkingAreaSchema) => {
       data: { ...res[0] },
     };
   } catch (error) {
+    logger.error(error);
     const errMsg = errorHandler(error, "Failed to add parking area.");
     return {
       success: false,
@@ -112,6 +114,7 @@ export const addParkingAreaImages = async (
       data: uploadedImages,
     };
   } catch (error) {
+    logger.error(error);
     const errMsg = errorHandler(error, "Failed to add parking area images.");
     return {
       success: false,
@@ -186,6 +189,7 @@ export const addEVStation = async (data: AddEVSchema) => {
       data: { ...res[0] },
     };
   } catch (error) {
+    logger.error(error);
     const errMsg = errorHandler(error, "Failed to add parking area.");
     return {
       success: false,
@@ -219,6 +223,7 @@ export const addEVStationImages = async (
       data: uploadedImages,
     };
   } catch (error) {
+    logger.error(error);
     const errMsg = errorHandler(error, "Failed to add parking area images.");
     return {
       success: false,

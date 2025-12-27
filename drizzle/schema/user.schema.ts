@@ -1,15 +1,21 @@
-import { boolean, integer, pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  pgTable,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { evStations, parkingAreas } from "./location.schema";
 import { relations } from "drizzle-orm";
 import { evChargingBookings, parkingBookings } from "./booking.schema";
 import { payments } from "./payment.schema";
-import { evConnectorTypeEnum, vehicleBodyTypeEnum } from "./enum"
+import { evConnectorTypeEnum, vehicleBodyTypeEnum } from "./enum";
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
   email: varchar("email", { length: 256 }).unique().notNull(),
   password: varchar("password", { length: 256 }), // For email/password logins
-  provider: varchar("provider", { length: 50 }), // e.g., 'google', 'email'
   firstName: varchar("first_name", { length: 256 }),
   lastName: varchar("last_name", { length: 256 }),
   phoneNumber: varchar("phone_number", { length: 20 }),
@@ -84,10 +90,13 @@ export const userVehicleImagesRelations = relations(
   })
 );
 
-export const userVehiclesRelations = relations(userVehicles, ({ one, many }) => ({
-  user: one(users, {
-    fields: [userVehicles.userId],
-    references: [users.id],
-  }),
-  parkingBookings: many(parkingBookings), // This vehicle can be used in parking bookings
-}));
+export const userVehiclesRelations = relations(
+  userVehicles,
+  ({ one, many }) => ({
+    user: one(users, {
+      fields: [userVehicles.userId],
+      references: [users.id],
+    }),
+    parkingBookings: many(parkingBookings), // This vehicle can be used in parking bookings
+  })
+);

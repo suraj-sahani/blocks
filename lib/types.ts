@@ -24,3 +24,15 @@ export interface State
 export interface City
   extends Omit<typeof cities.$inferSelect, "createdAt" | "updatedAt"> {}
 export type Location = (typeof mockLocations)[number];
+
+///////////////////////// Helper Types ///////////////////////////
+export interface ServerActionSuccessResponse<T> {
+  success: boolean;
+  message: string;
+  data?: T;
+}
+
+export interface ServerActionErrorResponse {
+  success: boolean;
+  error: string;
+}

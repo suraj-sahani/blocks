@@ -16,12 +16,17 @@ import {
 import { motion } from "motion/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Activity, useState } from "react";
 import { FieldInfo } from ".";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { signUp } from "@/lib/auth-client";
+import { signUpDb } from "@/lib/action/user.action";
+import { Spinner } from "../ui/spinner";
+
+import clientLogger from "@/lib/pino/client";
 
 const SignUpForm = () => {
   const searchParams = useSearchParams();
@@ -40,8 +45,9 @@ const SignUpForm = () => {
       agreeToTerms: false,
       signUpType: initialType,
     } as SignUpSchema,
-    onSubmit: ({ value }) => {
-      console.log(value);
+    onSubmit: async ({ value }) => {
+      const signUpResponse = await signUpDb(value);
+      clientLogger.info(signUpResponse);
     },
   });
 
@@ -246,7 +252,13 @@ const SignUpForm = () => {
                   className="w-full col-span-2"
                   disabled={!canSubmit || isSubmitting}
                 >
-                  Create Account
+                  <Activity mode={isSubmitting ? "visible" : "hidden"}>
+                    <Spinner />
+                  </Activity>
+                  <Activity mode={!isSubmitting ? "visible" : "hidden"}>
+                    Create Account
+                  </Activity>
+
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               )}
