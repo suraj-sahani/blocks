@@ -4,7 +4,7 @@ import { ENV_SCHEMA } from "./lib/schema";
 ENV_SCHEMA.parse(process.env);
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  typedRoutes: true,
   serverExternalPackages: ["pino", "pino-pretty"],
 };
 

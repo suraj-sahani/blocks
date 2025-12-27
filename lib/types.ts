@@ -36,3 +36,7 @@ export interface ServerActionErrorResponse {
   success: boolean;
   error: string;
 }
+
+export type ServerActionResponse<T> =
+  | ServerActionSuccessResponse<T>
+  | ServerActionErrorResponse;

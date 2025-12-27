@@ -1,15 +1,22 @@
 "use server";
 
-import { signUp } from "../auth/client";
+import { authClient } from "../auth/client";
 import { logger } from "../pino/server";
-import { SignUpSchema } from "../types";
+import { ServerActionResponse, SignUpSchema } from "../types";
 
-const log = logger.child({ module: "totoro" });
-
-export const signUpDb = async (data: SignUpSchema) => {
+export const signUpDb = async (
+  data: SignUpSchema
+): Promise<
+  | {
+      success: true;
+      message: string;
+      data: any;
+    }
+  | { success: false; error: string }
+> => {
   try {
     const { email, password, fullName } = data;
-    const user = await signUp.email({
+    const user = await authClient.signUp.email({
       email,
       password,
       name: fullName,
@@ -19,7 +26,9 @@ export const signUpDb = async (data: SignUpSchema) => {
       logger.error(user);
       return {
         success: false,
-        error: user.error.message,
+        error:
+          user.error.message ||
+          `Sign up failed with status code: ${user.error.status}`,
       };
     }
 

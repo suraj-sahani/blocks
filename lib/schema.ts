@@ -30,6 +30,8 @@ export const ENV_SCHEMA = z.object({
 export const SIGN_IN_SCHEMA = z.object({
   email: z.email().nonempty({ error: "Email is required." }),
   password: z.string().nonempty({ error: "Password is required." }),
+  signUpType: z.enum(["user", "host"], { error: "Sign up type is required." }),
+  rememberMe: z.boolean({ error: "Remember can only be true or false" }),
 });
 
 export const SIGN_UP_SCHEMA = z.object({

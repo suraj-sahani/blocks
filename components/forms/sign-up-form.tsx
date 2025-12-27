@@ -26,6 +26,7 @@ import { Label } from "../ui/label";
 import { Spinner } from "../ui/spinner";
 
 import clientLogger from "@/lib/pino/client";
+import toast from "react-hot-toast";
 
 const SignUpForm = () => {
   const searchParams = useSearchParams();
@@ -44,8 +45,13 @@ const SignUpForm = () => {
       signUpType: initialType,
     } as SignUpSchema,
     onSubmit: async ({ value }) => {
-      const signUpResponse = await signUpDb(value);
-      clientLogger.info(signUpResponse);
+      const res = await signUpDb(value);
+      if (!res.success) {
+        toast.error(res.error);
+      } else {
+        toast.success(res.message);
+      }
+      clientLogger.info(res);
     },
   });
 
@@ -250,7 +256,7 @@ const SignUpForm = () => {
           <p className="text-center text-muted-foreground mt-8">
             Already have an account?{" "}
             <Link
-              href="/signin"
+              href="/sign-in"
               className="text-primary font-medium hover:underline"
             >
               Sign in
