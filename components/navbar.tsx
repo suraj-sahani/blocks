@@ -1,10 +1,19 @@
 "use client";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Car, Zap, Menu, X } from "lucide-react";
-import { useState } from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { motion } from "framer-motion";
+import { Car, Menu, Zap } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import UserProfile from "./user-profile";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -54,7 +63,7 @@ export const Navbar = () => {
               EV Charging
             </Link>
             <Link
-              href="dashboard"
+              href="/dashboard"
               className="text-foreground/70 hover:text-foreground transition-colors font-medium"
             >
               Become a Host
@@ -62,68 +71,71 @@ export const Navbar = () => {
           </div>
 
           {/* Auth Buttons */}
-          <div className="hidden lg:flex items-center gap-3">
-            <Button variant="ghost" asChild>
-              <Link href="/sign-in">Sign In</Link>
-            </Button>
-            <Button variant="hero" asChild>
-              <Link href="/sign-up">Get Started</Link>
-            </Button>
-          </div>
+          <UserProfile className="hidden md:inline-flex" />
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
-          >
-            {isMenuOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
-          </button>
+          {/* Mobile Navigation */}
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="outline">
+                <Menu className="w-6 h-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>
+                  {/* Logo */}
+                  <Link href="/" className="flex items-center gap-2 group">
+                    <div className="relative">
+                      <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary to-teal-400 flex items-center justify-center shadow-lg group-hover:shadow-glow transition-all duration-300">
+                        <Car className="w-5 h-5 text-primary-foreground" />
+                      </div>
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-accent flex items-center justify-center">
+                        <Zap className="w-2.5 h-2.5 text-accent-foreground" />
+                      </div>
+                    </div>
+                    <span className="text-xl font-bold tracking-tight">
+                      Park<span className="text-primary">Volt</span>
+                    </span>
+                  </Link>
+                </SheetTitle>
+                <SheetDescription>
+                  Find parking and EV charging spaces near you.
+                </SheetDescription>
+              </SheetHeader>
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="py-4 border-t border-border bg-background/95 backdrop-blur-xl"
+              >
+                <div className="flex flex-col gap-4">
+                  <Link
+                    href="/search"
+                    className="px-4 py-2 text-foreground/70 hover:text-foreground transition-colors font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Find Parking
+                  </Link>
+                  <Link
+                    href="/search?type=ev"
+                    className="px-4 py-2 text-foreground/70 hover:text-foreground transition-colors font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    EV Charging
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    className="px-4 py-2 text-foreground/70 hover:text-foreground transition-colors font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Become a Host
+                  </Link>
+
+                  <UserProfile className="px-2" />
+                </div>
+              </motion.div>
+            </SheetContent>
+          </Sheet>
         </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="lg:hidden py-4 border-t border-border bg-background/95 backdrop-blur-xl"
-          >
-            <div className="flex flex-col gap-4">
-              <Link
-                href="/search"
-                className="px-4 py-2 text-foreground/70 hover:text-foreground transition-colors font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Find Parking
-              </Link>
-              <Link
-                href="/search?type=ev"
-                className="px-4 py-2 text-foreground/70 hover:text-foreground transition-colors font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                EV Charging
-              </Link>
-              <Link
-                href="/dashboard"
-                className="px-4 py-2 text-foreground/70 hover:text-foreground transition-colors font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Become a Host
-              </Link>
-              <div className="flex gap-3 px-4 pt-4 border-t border-border">
-                <Button variant="ghost" asChild className="flex-1">
-                  <Link href="/signin">Sign In</Link>
-                </Button>
-                <Button variant="hero" asChild className="flex-1">
-                  <Link href="/signup">Get Started</Link>
-                </Button>
-              </div>
-            </div>
-          </motion.div>
-        )}
       </div>
     </motion.nav>
   );
