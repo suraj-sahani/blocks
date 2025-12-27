@@ -33,8 +33,7 @@ export const SIGN_IN_SCHEMA = z.object({
 });
 
 export const SIGN_UP_SCHEMA = z.object({
-  firstName: z.string().trim().nonempty({ error: "First name is required." }),
-  lastName: z.string().trim().nonempty({ error: "Last name is required." }),
+  fullName: z.string().trim().nonempty({ error: "First name is required." }),
   email: z.email().nonempty({ error: "Email is required." }),
   password: z.string().nonempty({ error: "Password is required." }),
   agreeToTerms: z.boolean({

@@ -8,11 +8,11 @@ const log = logger.child({ module: "totoro" });
 
 export const signUpDb = async (data: SignUpSchema) => {
   try {
-    const { email, password, firstName, lastName } = data;
+    const { email, password, fullName } = data;
     const user = await signUp.email({
       email,
       password,
-      name: firstName + lastName,
+      name: fullName,
     });
 
     if (user.error) {

@@ -1,4 +1,5 @@
 "use client";
+import { signUpDb } from "@/lib/action/user.action";
 import { SIGN_UP_SCHEMA } from "@/lib/schema";
 import { SignUpSchema } from "@/lib/types";
 import { useForm, useStore } from "@tanstack/react-form";
@@ -22,8 +23,6 @@ import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { signUp } from "@/lib/auth-client";
-import { signUpDb } from "@/lib/action/user.action";
 import { Spinner } from "../ui/spinner";
 
 import clientLogger from "@/lib/pino/client";
@@ -38,8 +37,7 @@ const SignUpForm = () => {
       onChange: SIGN_UP_SCHEMA,
     },
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      fullName: "",
       email: "",
       password: "",
       agreeToTerms: false,
@@ -124,29 +122,13 @@ const SignUpForm = () => {
             />
 
             <form.Field
-              name="firstName"
+              name="fullName"
               children={(field) => (
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="firstName">Full Name</Label>
                   <Input
                     id="firstName"
-                    placeholder="John"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                  <FieldInfo field={field} />
-                </div>
-              )}
-            />
-
-            <form.Field
-              name="lastName"
-              children={(field) => (
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input
-                    id="lastName"
-                    placeholder="Doe"
+                    placeholder="John Doe"
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
