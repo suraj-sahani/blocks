@@ -16,7 +16,7 @@ import {
   User,
   Building2,
 } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useForm, useStore } from "@tanstack/react-form";
 import { SIGN_IN_SCHEMA } from "@/lib/schema";
@@ -27,6 +27,7 @@ import { Spinner } from "../ui/spinner";
 
 export function SignInForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const initialType = searchParams.get("type") === "host" ? "host" : "user";
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm({
@@ -52,6 +53,7 @@ export function SignInForm() {
         );
       } else {
         toast.success("Sign in successful");
+        router.push("/");
       }
       clientLogger.info(res);
     },

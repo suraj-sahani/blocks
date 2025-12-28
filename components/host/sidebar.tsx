@@ -25,12 +25,12 @@ const menuItems = [
   { icon: MapPin, label: "My Listings", path: "/host/listings" },
   { icon: Wallet, label: "Revenue", path: "/host/revenue" },
   { icon: User, label: "Profile", path: "/host/profile" },
-];
+] as const;
 
 const addMenuItems = [
-  { icon: Car, label: "Add Parking", path: "/host/add-parking" },
+  { icon: Car, label: "Add Parking", path: "/host/add-parking-area" },
   { icon: Zap, label: "Add EV Station", path: "/host/add-ev-station" },
-];
+] as const;
 
 export const HostSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);

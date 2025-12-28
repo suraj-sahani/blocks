@@ -44,7 +44,7 @@ export function AutoComplete({
         <Button
           variant="outline"
           role="combobox"
-          className="w-full justify-between"
+          className="w-full justify-between border-input text-foreground hover:bg-transparent hover:text-foreground"
           disabled={disabled || loading}
         >
           {value && options.find((option) => option.id === value)?.label

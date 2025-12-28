@@ -137,7 +137,7 @@ export default function Home() {
                   </Link>
                 </Button>
                 <Button variant="outline" size="xl" asChild>
-                  <Link href="/host/dashboard">
+                  <Link href="/sign-up?type=host">
                     Become a Host
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Link>
@@ -329,7 +329,7 @@ export default function Home() {
                   ))}
                 </ul>
                 <Button variant="accent" size="lg" asChild>
-                  <Link href="/host/signup">
+                  <Link href="/sign-up?type=host">
                     Start Hosting
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Link>
@@ -488,7 +488,7 @@ export default function Home() {
                   className="bg-white text-primary hover:bg-white/90 shadow-xl"
                   asChild
                 >
-                  <Link href="/signup">
+                  <Link href="/sign-up">
                     Get Started Free
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Link>
