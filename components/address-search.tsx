@@ -14,8 +14,14 @@ type Props = {
   onPlaceSelect: (place: PlaceResult) => void;
   onSearchChange: (e: string) => void;
   value?: string;
+  placeholder?: string;
 };
-const AddressSearch = ({ onPlaceSelect, value, onSearchChange }: Props) => {
+const AddressSearch = ({
+  onPlaceSelect,
+  value,
+  placeholder,
+  onSearchChange,
+}: Props) => {
   const autoCompleteInst = useRef<AutoCompleteService>(null);
   const [suggestions, setSuggestions] = useState<Predictions>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -100,7 +106,7 @@ const AddressSearch = ({ onPlaceSelect, value, onSearchChange }: Props) => {
       <InputGroup>
         <InputGroupInput
           disabled={isLoading}
-          placeholder={isLoading ? "Searching..." : "Search"}
+          placeholder={isLoading ? "Searching..." : placeholder || "Search"}
           value={value || ""}
           onChange={(e) => {
             onSearchChange(e.target.value);
@@ -126,7 +132,7 @@ const AddressSearch = ({ onPlaceSelect, value, onSearchChange }: Props) => {
       <Activity
         mode={suggestions.length > 0 && showSuggestions ? "visible" : "hidden"}
       >
-        <ul className="absolute z-10 p-1 rounded-md bg-white shadow space-y-1 top-[110%]">
+        <ul className="absolute w-full z-10 p-1 rounded-md bg-white shadow space-y-1 top-[110%]">
           {suggestions.map((suggestion) => (
             <li
               className="hover:bg-neutral-200 transition-all duration-200 p-1 rounded-md cursor-pointer text-xs font-semibold"

@@ -1,4 +1,6 @@
+"use client";
 import { ImageUp, X } from "lucide-react";
+import { motion } from "motion/react";
 import Image from "next/image";
 import React, { useRef } from "react";
 import { Button } from "./ui/button";
@@ -64,27 +66,31 @@ const ImageUpload = ({
         <div className="space-y-2 mt-4">
           <p className="text-sm font-bold">Uploaded Image :</p>
           <div className="grid grid-cols-3 gap-2">
-            {value?.length &&
-              value.map((image, index) => (
-                <div className="relative w-fit" key={image.name + index}>
-                  <Image
-                    src={URL.createObjectURL(image) || ""}
-                    height={130}
-                    width={130}
-                    alt={image.name || ""}
-                    key={image.name}
-                    className="rounded-xl"
-                  />
-                  <Button
-                    size={"icon"}
-                    type="button"
-                    className="text-black size-6 absolute -top-2 -right-2 bg-slate-300 rounded-full border border-black hover:bg-slate-500 hover:text-white"
-                    onClick={() => handleImageRemove(index)}
-                  >
-                    <X />
-                  </Button>
-                </div>
-              ))}
+            {value.map((image, index) => (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative w-fit"
+                key={image.name + index}
+              >
+                <Image
+                  src={URL.createObjectURL(image) || ""}
+                  height={130}
+                  width={130}
+                  alt={image.name || ""}
+                  key={image.name}
+                  className="rounded-xl"
+                />
+                <Button
+                  size={"icon"}
+                  type="button"
+                  className="text-black size-6 absolute -top-2 -right-2 bg-slate-300 rounded-full border border-black hover:bg-slate-500 hover:text-white"
+                  onClick={() => handleImageRemove(index)}
+                >
+                  <X />
+                </Button>
+              </motion.div>
+            ))}
           </div>
         </div>
       ) : null}

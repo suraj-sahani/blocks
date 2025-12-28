@@ -13,7 +13,7 @@ export default async function AddEVStationPage() {
         subtitle="List a new EV charging station"
       />
       <section className="p-8">
-        <AddEvStationFormV2 />
+        <AddEvStationFormV2 states={states} />
       </section>
     </>
   );

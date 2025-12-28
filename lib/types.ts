@@ -1,7 +1,9 @@
 import * as z from "zod";
 import {
   ADD_EV_SCHEMA,
+  ADD_EV_SCHEMA_V2,
   ADD_PARKING_SCHEMA,
+  ADD_PARKING_SCHEMA_V2,
   ENV_SCHEMA,
   SIGN_IN_SCHEMA,
   SIGN_UP_SCHEMA,
@@ -16,7 +18,13 @@ export interface SignUpSchema extends z.infer<typeof SIGN_UP_SCHEMA> {}
 export interface SignInSchema extends z.infer<typeof SIGN_IN_SCHEMA> {}
 export interface AddParkingAreaSchema
   extends z.infer<typeof ADD_PARKING_SCHEMA> {}
+
+export interface AddParkingAreaSchemaV2
+  extends z.infer<typeof ADD_PARKING_SCHEMA_V2> {}
+
 export interface AddEVSchema extends z.infer<typeof ADD_EV_SCHEMA> {}
+
+export interface AddEVSchemaV2 extends z.infer<typeof ADD_EV_SCHEMA_V2> {}
 
 ////////////////////////// DTO //////////////////////////////////
 export interface State
