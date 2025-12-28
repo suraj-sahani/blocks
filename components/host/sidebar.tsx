@@ -13,7 +13,7 @@ import {
   Zap,
   LogOut,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -35,6 +35,40 @@ const addMenuItems = [
 export const HostSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+
+  const handleMobileResize = () => {
+    if (window.innerWidth < 1024) {
+      setCollapsed(true);
+      document.documentElement.style.setProperty(
+        "--host-sidebar-width",
+        "80px"
+      );
+    } else {
+      setCollapsed(false);
+      document.documentElement.style.setProperty(
+        "--host-sidebar-width",
+        "280px"
+      );
+    }
+  };
+
+  const handleCollapseChange = () => {
+    setCollapsed((prev) => {
+      document.documentElement.style.setProperty(
+        "--host-sidebar-width",
+        !prev ? "80px" : "280px"
+      );
+      return !prev;
+    });
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", handleMobileResize);
+
+    return () => {
+      window.removeEventListener("resize", handleMobileResize);
+    };
+  }, []);
 
   return (
     <motion.aside
@@ -129,7 +163,7 @@ export const HostSidebar = () => {
       {/* Collapse Button */}
       <div className="p-3 border-t border-border">
         <button
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={() => handleCollapseChange()}
           className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-200"
         >
           {collapsed ? (

@@ -13,12 +13,6 @@ export default async function AddParkingAreaPage() {
         subtitle="List a new parking location"
       />
       <section className="p-8">
-        {/* <Card>
-          <CardHeader>Add Parking Area</CardHeader>
-          <CardContent>
-            <AddParkingAreaForm states={states} />
-          </CardContent>
-        </Card> */}
         <AddParkingAreaFormV2 />
       </section>
     </>

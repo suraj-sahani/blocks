@@ -5,7 +5,14 @@ export default function HostLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen">
       <HostSidebar />
-      <main className="ml-[280px] transition-all duration-300">{children}</main>
+      <main
+        style={{
+          marginLeft: "var(--host-sidebar-width, 280px)",
+        }}
+        className="transition-all duration-300"
+      >
+        {children}
+      </main>
     </div>
   );
 }

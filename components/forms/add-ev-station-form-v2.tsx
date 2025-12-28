@@ -183,10 +183,10 @@ export default function AddEvStationFormV2() {
   return (
     <div className="max-w-4xl mx-auto">
       {/* Progress Steps */}
-      <div className="mb-8">
+      <div className="mb-6 md:mb-8">
         <div className="flex items-center justify-between relative">
           {/* Progress Line */}
-          <div className="absolute top-6 left-0 right-0 h-0.5 bg-border">
+          <div className="absolute top-5 sm:top-6 left-0 right-0 h-0.5 bg-border">
             <motion.div
               className="h-full bg-accent"
               initial={{ width: "0%" }}
@@ -198,10 +198,10 @@ export default function AddEvStationFormV2() {
           {steps.map((step) => (
             <div
               key={step.number}
-              className="relative z-10 flex flex-col items-center"
+              className="relative z-10 flex flex-col items-center flex-1"
             >
               <motion.div
-                className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-lg transition-colors ${
+                className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-semibold text-base sm:text-lg transition-colors ${
                   currentStep > step.number
                     ? "bg-accent text-accent-foreground"
                     : currentStep === step.number
@@ -215,14 +215,14 @@ export default function AddEvStationFormV2() {
                 transition={{ duration: 0.2 }}
               >
                 {currentStep > step.number ? (
-                  <Check className="w-5 h-5" />
+                  <Check className="w-4 h-4 sm:w-5 sm:h-5" />
                 ) : (
                   step.number
                 )}
               </motion.div>
-              <div className="mt-3 text-center">
+              <div className="mt-2 sm:mt-3 text-center px-1">
                 <p
-                  className={`font-medium ${
+                  className={`text-xs sm:text-sm font-medium ${
                     currentStep >= step.number
                       ? "text-foreground"
                       : "text-muted-foreground"
@@ -230,7 +230,7 @@ export default function AddEvStationFormV2() {
                 >
                   {step.title}
                 </p>
-                <p className="text-xs text-muted-foreground mt-0.5 hidden sm:block">
+                <p className="text-xs text-muted-foreground mt-0.5 hidden md:block">
                   {step.description}
                 </p>
               </div>
@@ -459,26 +459,31 @@ export default function AddEvStationFormV2() {
                       key={day}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className={`flex items-center gap-4 p-3 rounded-xl border-2 transition-colors ${
+                      className={`flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 rounded-xl border-2 transition-colors ${
                         schedule[day].enabled
                           ? "border-border"
                           : "border-border/50 bg-muted/30"
                       }`}
                     >
-                      <Checkbox
-                        checked={schedule[day].enabled}
-                        onCheckedChange={(checked) =>
-                          updateSchedule(day, "enabled", checked as boolean)
-                        }
-                      />
-                      <span
-                        className={`w-24 font-medium ${
-                          !schedule[day].enabled && "text-muted-foreground"
-                        }`}
-                      >
-                        {day}
-                      </span>
-                      <div className="flex items-center gap-2 flex-1">
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          checked={schedule[day].enabled}
+                          onCheckedChange={(checked) =>
+                            updateSchedule(day, "enabled", checked as boolean)
+                          }
+                        />
+                        <span
+                          className={`w-20 sm:w-24 font-medium text-sm sm:text-base ${
+                            !schedule[day].enabled && "text-muted-foreground"
+                          }`}
+                        >
+                          {day.slice(0, 3)}
+                          <span className="hidden sm:inline">
+                            {day.slice(3)}
+                          </span>
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 flex-1 pl-8 sm:pl-0">
                         <Input
                           type="time"
                           value={schedule[day].open}
@@ -486,9 +491,11 @@ export default function AddEvStationFormV2() {
                             updateSchedule(day, "open", e.target.value)
                           }
                           disabled={!schedule[day].enabled}
-                          className="w-32"
+                          className="flex-1 sm:w-28 sm:flex-none"
                         />
-                        <span className="text-muted-foreground">to</span>
+                        <span className="text-muted-foreground text-sm">
+                          to
+                        </span>
                         <Input
                           type="time"
                           value={schedule[day].close}
@@ -496,7 +503,7 @@ export default function AddEvStationFormV2() {
                             updateSchedule(day, "close", e.target.value)
                           }
                           disabled={!schedule[day].enabled}
-                          className="w-32"
+                          className="flex-1 sm:w-28 sm:flex-none"
                         />
                       </div>
                     </motion.div>
@@ -533,13 +540,13 @@ export default function AddEvStationFormV2() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="p-4 rounded-xl border-2 border-border hover:border-accent/30 transition-colors"
+                    className="p-3 sm:p-4 rounded-xl border-2 border-border hover:border-accent/30 transition-colors"
                   >
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                        <Zap className="w-5 h-5 text-accent" />
+                    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                        <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
                       </div>
-                      <h4 className="font-semibold">
+                      <h4 className="font-semibold text-sm sm:text-base">
                         Charging Port #{port.id}
                       </h4>
                     </div>
@@ -547,8 +554,8 @@ export default function AddEvStationFormV2() {
                     <div className="grid gap-4">
                       {/* Connector Type */}
                       <div className="space-y-2">
-                        <Label>Connector Type</Label>
-                        <div className="flex flex-wrap gap-2">
+                        <Label className="text-sm">Connector Type</Label>
+                        <div className="flex flex-wrap gap-1.5 sm:gap-2">
                           {CONNECTOR_TYPES.map((type) => (
                             <motion.button
                               key={type.id}
@@ -558,7 +565,7 @@ export default function AddEvStationFormV2() {
                               onClick={() =>
                                 updatePort(port.id, "connectorType", type.id)
                               }
-                              className={`px-3 py-2 rounded-lg text-sm transition-all ${
+                              className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm transition-all ${
                                 port.connectorType === type.id
                                   ? "bg-accent text-accent-foreground"
                                   : "bg-muted hover:bg-muted/80"
@@ -572,8 +579,8 @@ export default function AddEvStationFormV2() {
 
                       {/* Charger Level */}
                       <div className="space-y-2">
-                        <Label>Charger Level</Label>
-                        <div className="grid md:grid-cols-3 gap-2">
+                        <Label className="text-sm">Charger Level</Label>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                           {CHARGER_LEVELS.map((level) => (
                             <motion.button
                               key={level.id}
@@ -583,17 +590,19 @@ export default function AddEvStationFormV2() {
                               onClick={() =>
                                 updatePort(port.id, "chargerLevel", level.id)
                               }
-                              className={`p-3 rounded-lg text-left transition-all ${
+                              className={`p-2.5 sm:p-3 rounded-lg text-left transition-all ${
                                 port.chargerLevel === level.id
                                   ? "bg-accent/10 border-2 border-accent"
                                   : "bg-muted border-2 border-transparent hover:bg-muted/80"
                               }`}
                             >
-                              <div className="font-medium">{level.label}</div>
+                              <div className="font-medium text-sm">
+                                {level.label}
+                              </div>
                               <div className="text-xs text-muted-foreground">
                                 {level.power}
                               </div>
-                              <div className="text-xs text-muted-foreground mt-1">
+                              <div className="text-xs text-muted-foreground mt-1 hidden sm:block">
                                 {level.description}
                               </div>
                             </motion.button>
@@ -601,16 +610,16 @@ export default function AddEvStationFormV2() {
                         </div>
                       </div>
 
-                      <div className="grid md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 gap-3 sm:gap-4">
                         {/* Max Power */}
                         <div className="space-y-2">
-                          <Label>Max Power Output (kW)</Label>
+                          <Label className="text-sm">Max Power (kW)</Label>
                           <div className="relative">
                             <Zap className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <Input
                               type="number"
                               step="0.1"
-                              placeholder="e.g., 150"
+                              placeholder="150"
                               value={port.maxPower}
                               onChange={(e) =>
                                 updatePort(port.id, "maxPower", e.target.value)
@@ -622,11 +631,11 @@ export default function AddEvStationFormV2() {
 
                         {/* Price per kWh */}
                         <div className="space-y-2">
-                          <Label>Price per kWh ($)</Label>
+                          <Label className="text-sm">Price/kWh ($)</Label>
                           <Input
                             type="number"
                             step="0.01"
-                            placeholder="e.g., 0.35"
+                            placeholder="0.35"
                             value={port.pricePerKwh}
                             onChange={(e) =>
                               updatePort(port.id, "pricePerKwh", e.target.value)
@@ -684,13 +693,13 @@ export default function AddEvStationFormV2() {
         </AnimatePresence>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-between mt-8 pt-6 border-t border-border">
+        <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-border">
           <Button
             type="button"
             variant="outline"
             onClick={prevStep}
             disabled={currentStep === 1}
-            className="gap-2"
+            className="gap-2 w-full sm:w-auto"
           >
             <ChevronLeft className="w-4 h-4" />
             Previous
@@ -701,17 +710,25 @@ export default function AddEvStationFormV2() {
               type="button"
               variant="accent"
               onClick={nextStep}
-              className="gap-2"
+              className="gap-2 w-full sm:w-auto"
             >
               Next Step
               <ChevronRight className="w-4 h-4" />
             </Button>
           ) : (
-            <div className="flex gap-3">
-              <Button type="button" variant="outline">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto order-2 sm:order-1"
+              >
                 Save as Draft
               </Button>
-              <Button type="submit" variant="accent" className="gap-2">
+              <Button
+                type="submit"
+                variant="accent"
+                className="gap-2 w-full sm:w-auto order-1 sm:order-2"
+              >
                 <Plus className="w-4 h-4" />
                 Publish Listing
               </Button>
