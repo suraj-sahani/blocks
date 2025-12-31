@@ -8,7 +8,9 @@ import {
   primaryKey,
   smallint,
   text,
+  time,
   timestamp,
+  uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -20,6 +22,16 @@ import {
   parkingSlotTypeEnum,
   vehicleBodyTypeEnum,
 } from "./enum";
+
+export const dayOfWeekEnum = pgEnum("day_of_week", [
+  "sunday",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+]);
 
 export const parkingAreas = pgTable("parking_areas", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -143,9 +155,10 @@ export const parkingAreasRelations = relations(
       references: [cities.id],
     }),
     parkingSlots: many(parkingSlots),
-    parkingBookings: many(parkingBookings), // Add this relation if needed to see all bookings for an area
-    parkingAreaImages: many(parkingAreaImages), // NEW RELATION to parking_area_images
+    parkingBookings: many(parkingBookings),
+    parkingAreaImages: many(parkingAreaImages),
     parkingAreaAmenities: many(parkingAreaAmenities),
+    schedule: many(parkingAreaSchedules),
   })
 );
 
@@ -159,9 +172,10 @@ export const evStationsRelations = relations(evStations, ({ one, many }) => ({
     references: [cities.id],
   }),
   evChargingSlots: many(evChargingSlots),
-  evChargingBookings: many(evChargingBookings), // Add this relation to directly get bookings for a station
-  evStationImages: many(evStationImages), // NEW RELATION to ev_station_images
+  evChargingBookings: many(evChargingBookings),
+  evStationImages: many(evStationImages),
   evStationAmenities: many(evStationAmenities),
+  schedule: many(evStationSchedules),
 }));
 
 export const parkingAreaImages = pgTable("parking_area_images", {
@@ -294,9 +308,8 @@ export const parkingSlotPricesRelations = relations(
 
 export const states = pgTable("states", {
   id: uuid("id").defaultRandom().primaryKey(),
-  name: varchar("name", { length: 256 }).unique().notNull(), // e.g., "California"
-  abbreviation: varchar("abbreviation", { length: 2 }).unique().notNull(), // e.g., "CA"
-  // REMOVED: countryCode: varchar("country_code", { length: 2 }).notNull().default("US"),
+  name: varchar("name", { length: 256 }).unique().notNull(),
+  abbreviation: varchar("abbreviation", { length: 2 }).unique().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -305,15 +318,15 @@ export const states = pgTable("states", {
 });
 
 export const statesRelations = relations(states, ({ many }) => ({
-  cities: many(cities), // A state has many cities
+  cities: many(cities),
 }));
 
 export const cities = pgTable("cities", {
   id: uuid("id").defaultRandom().primaryKey(),
   stateId: uuid("state_id")
     .notNull()
-    .references(() => states.id, { onDelete: "cascade" }), // City belongs to a state
-  name: varchar("name", { length: 256 }).notNull(), // e.g., "Los Angeles"
+    .references(() => states.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 256 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -326,6 +339,76 @@ export const citiesRelations = relations(cities, ({ one, many }) => ({
     fields: [cities.stateId],
     references: [states.id],
   }),
-  parkingAreas: many(parkingAreas), // A city has many parking areas
-  evStations: many(evStations), // A city has many EV stations
+  parkingAreas: many(parkingAreas),
+  evStations: many(evStations),
 }));
+
+export const parkingAreaSchedules = pgTable(
+  "parking_area_schedules",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    parkingAreaId: uuid("parking_area_id")
+      .notNull()
+      .references(() => parkingAreas.id, { onDelete: "cascade" }),
+    dayOfWeek: dayOfWeekEnum("day_of_week").notNull(),
+    openingTime: time("opening_time"), // supports "HH:MM:SS" & "HH:MM" strings
+    closingTime: time("closing_time"), // supports "HH:MM:SS" & "HH:MM" strings
+    isClosed: boolean("is_closed").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => {
+    return {
+      // Enforce unique schedule per parking area per day
+      unqParkingAreaDay: uniqueIndex("unq_parking_area_day").on(
+        table.parkingAreaId,
+        table.dayOfWeek
+      ),
+    };
+  }
+);
+
+export const parkingAreaSchedulesRelations = relations(
+  parkingAreaSchedules,
+  ({ one }) => ({
+    parkingArea: one(parkingAreas, {
+      fields: [parkingAreaSchedules.parkingAreaId],
+      references: [parkingAreas.id],
+    }),
+  })
+);
+
+export const evStationSchedules = pgTable(
+  "ev_station_schedules",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    evStationId: uuid("ev_station_id")
+      .notNull()
+      .references(() => evStations.id, { onDelete: "cascade" }),
+    dayOfWeek: dayOfWeekEnum("day_of_week").notNull(),
+    openingTime: time("opening_time"), // supports "HH:MM:SS" & "HH:MM" strings
+    closingTime: time("closing_time"), // supports "HH:MM:SS" & "HH:MM" strings
+    isClosed: boolean("is_closed").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => {
+    return {
+      // Enforce unique schedule per EV station per day
+      unqEvStationDay: uniqueIndex("unq_ev_station_day").on(
+        table.evStationId,
+        table.dayOfWeek
+      ),
+    };
+  }
+);
+
+export const evStationSchedulesRelations = relations(
+  evStationSchedules,
+  ({ one }) => ({
+    evStation: one(evStations, {
+      fields: [evStationSchedules.evStationId],
+      references: [evStations.id],
+    }),
+  })
+);

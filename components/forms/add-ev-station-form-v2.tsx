@@ -23,7 +23,7 @@ import {
   Plus,
   Zap,
 } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, m, motion } from "motion/react";
 import { Activity, useState } from "react";
 import { FieldInfo } from ".";
 import AddressSearch from "../address-search";
@@ -249,19 +249,36 @@ export default function AddEvStationFormV2({ states }: Props) {
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 3));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
-  const handleStepChange = async () => {
+  const handleStepChange = async (step: "prev" | "next") => {
+    const actions = {
+      prev: prevStep,
+      next: nextStep,
+    };
     const values = form.state.values;
 
     const currentStepSchema = steps[currentStep - 1];
 
     const result = currentStepSchema.schema.safeParse(values);
-
     if (!result.success) {
       result.error.issues.forEach((issue) => {
         const field = issue.path[0] as keyof AddEVSchemaV2;
         //  Implement logic to set errors
+        form.setFieldMeta(field, (meta) => ({
+          ...meta,
+          errorMap: {
+            onChange: {
+              message: issue.message,
+            },
+          },
+          isTouched: true,
+        }));
       });
+
+      // Early return to stop from changing page
+      return;
     }
+
+    await actions[step]();
   };
 
   return (
@@ -906,7 +923,7 @@ export default function AddEvStationFormV2({ states }: Props) {
             <Button
               type="button"
               variant="outline"
-              onClick={prevStep}
+              onClick={() => handleStepChange("prev")}
               disabled={currentStep === 1}
               className="gap-2 w-full sm:w-auto"
             >
@@ -918,7 +935,7 @@ export default function AddEvStationFormV2({ states }: Props) {
               <Button
                 type="button"
                 variant="accent"
-                onClick={nextStep}
+                onClick={() => handleStepChange("next")}
                 className="gap-2 w-full sm:w-auto"
               >
                 Next Step
