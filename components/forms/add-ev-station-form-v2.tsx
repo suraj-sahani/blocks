@@ -29,6 +29,7 @@ import { FieldInfo } from ".";
 import AddressSearch from "../address-search";
 import { AutoComplete } from "../ui/auto-complete";
 import ImageUpload from "../upload";
+import { cn } from "@/lib/utils";
 
 const CONNECTOR_TYPES = [
   { id: "ccs", label: "CCS", description: "Combined Charging System" },
@@ -85,6 +86,51 @@ const DAYS = [
   "Sunday",
 ];
 
+const schedule = [
+  {
+    dayOfWeek: 0,
+    isClosed: false,
+    open: new Date(),
+    close: new Date(),
+  },
+  {
+    dayOfWeek: 1,
+    isClosed: false,
+    open: new Date(),
+    close: new Date(),
+  },
+  {
+    dayOfWeek: 2,
+    isClosed: false,
+    open: new Date(),
+    close: new Date(),
+  },
+  {
+    dayOfWeek: 3,
+    isClosed: false,
+    open: new Date(),
+    close: new Date(),
+  },
+  {
+    dayOfWeek: 4,
+    isClosed: false,
+    open: new Date(),
+    close: new Date(),
+  },
+  {
+    dayOfWeek: 5,
+    isClosed: false,
+    open: new Date(),
+    close: new Date(),
+  },
+  {
+    dayOfWeek: 6,
+    isClosed: false,
+    open: new Date(),
+    close: new Date(),
+  },
+];
+
 interface ChargingPort {
   id: number;
   connectorType: string;
@@ -99,7 +145,7 @@ export default function AddEvStationFormV2({ states }: Props) {
   const [currentStep, setCurrentStep] = useState(1);
 
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
-  const [capacity, setCapacity] = useState(1);
+
   const [chargingPorts, setChargingPorts] = useState<ChargingPort[]>([
     {
       id: 1,
@@ -109,15 +155,6 @@ export default function AddEvStationFormV2({ states }: Props) {
       pricePerKwh: "",
     },
   ]);
-  const [schedule, setSchedule] = useState(
-    DAYS.reduce(
-      (acc, day) => ({
-        ...acc,
-        [day]: { enabled: true, open: "00:00", close: "23:59" },
-      }),
-      {} as Record<string, { enabled: boolean; open: string; close: string }>
-    )
-  );
 
   const form = useForm({
     validators: {
@@ -130,14 +167,7 @@ export default function AddEvStationFormV2({ states }: Props) {
       state: "",
       totalConnectors: 1,
       description: "",
-      schedule: [
-        {
-          dayOfWeek: 1,
-          isClosed: false,
-          openingTime: new Date(),
-          closingTime: new Date(),
-        },
-      ],
+      schedule,
       connectors: [
         {
           vehicleTypes: [],
@@ -211,35 +241,6 @@ export default function AddEvStationFormV2({ states }: Props) {
     );
   };
 
-  const updateSchedule = (
-    day: string,
-    field: string,
-    value: string | boolean
-  ) => {
-    setSchedule((prev) => ({
-      ...prev,
-      [day]: { ...prev[day], [field]: value },
-    }));
-  };
-
-  const updateCapacity = (newCapacity: number) => {
-    setCapacity(newCapacity);
-    const newPorts: ChargingPort[] = [];
-    for (let i = 1; i <= newCapacity; i++) {
-      const existing = chargingPorts.find((p) => p.id === i);
-      newPorts.push(
-        existing || {
-          id: i,
-          connectorType: "ccs",
-          chargerLevel: "level2",
-          maxPower: "",
-          pricePerKwh: "",
-        }
-      );
-    }
-    setChargingPorts(newPorts);
-  };
-
   const updatePort = (id: number, field: keyof ChargingPort, value: string) => {
     setChargingPorts((prev) =>
       prev.map((port) => (port.id === id ? { ...port, [field]: value } : port))
@@ -256,28 +257,28 @@ export default function AddEvStationFormV2({ states }: Props) {
     };
     const values = form.state.values;
 
-    const currentStepSchema = steps[currentStep - 1];
+    // const currentStepSchema = steps[currentStep - 1];
 
-    const result = currentStepSchema.schema.safeParse(values);
-    if (!result.success) {
-      result.error.issues.forEach((issue) => {
-        const field = issue.path[0] as keyof AddEVSchemaV2;
-        //  Implement logic to set errors
-        form.setFieldMeta(field, (meta) => ({
-          ...meta,
-          errorMap: {
-            onChange: {
-              message: issue.message,
-            },
-          },
-          isTouched: true,
-        }));
-      });
+    // const result = currentStepSchema.schema.safeParse(values);
+    // if (!result.success) {
+    //   result.error.issues.forEach((issue) => {
+    //     const field = issue.path[0] as keyof AddEVSchemaV2;
+    //     //  Implement logic to set errors
+    //     form.setFieldMeta(field, (meta) => ({
+    //       ...meta,
+    //       errorMap: {
+    //         onChange: {
+    //           message: issue.message,
+    //         },
+    //       },
+    //       isTouched: true,
+    //     }));
+    //   });
 
-      // Early return to stop from changing page
-      return;
-    }
-
+    //   // Early return to stop from changing page
+    //   return;
+    // }
+    console.log(values);
     await actions[step]();
   };
 
@@ -494,6 +495,29 @@ export default function AddEvStationFormV2({ states }: Props) {
 
                   <div className="grid md:grid-cols-3 gap-4">
                     <form.Field
+                      name="state"
+                      children={(field) => (
+                        <div className="space-y-2">
+                          <Label htmlFor={"State"}>State*</Label>
+                          <AutoComplete
+                            key={field.name}
+                            options={formattedStates}
+                            placeholder="Select state"
+                            value={field.state.value}
+                            onSelectOption={(val) => {
+                              const selectedState = states.find(
+                                (state) => state.name === val
+                              );
+                              if (selectedState)
+                                field.handleChange(selectedState?.id);
+                            }}
+                          />
+                          <FieldInfo field={field} />
+                        </div>
+                      )}
+                    />
+
+                    <form.Field
                       name="city"
                       children={(field) => (
                         <div className="space-y-2">
@@ -517,28 +541,7 @@ export default function AddEvStationFormV2({ states }: Props) {
                         </div>
                       )}
                     />
-                    <form.Field
-                      name="state"
-                      children={(field) => (
-                        <div className="space-y-2">
-                          <Label htmlFor={"State"}>State*</Label>
-                          <AutoComplete
-                            key={field.name}
-                            options={formattedStates}
-                            placeholder="Select state"
-                            value={field.state.value}
-                            onSelectOption={(val) => {
-                              const selectedState = states.find(
-                                (state) => state.name === val
-                              );
-                              if (selectedState)
-                                field.handleChange(selectedState?.id);
-                            }}
-                          />
-                          <FieldInfo field={field} />
-                        </div>
-                      )}
-                    />
+
                     <form.Field
                       name="zipcode"
                       children={(field) => (
@@ -597,34 +600,51 @@ export default function AddEvStationFormV2({ states }: Props) {
                 </div>
 
                 {/* Capacity */}
-                <div className="space-y-3">
-                  <Label>Total Charging Ports *</Label>
-                  <div className="flex items-center gap-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => updateCapacity(Math.max(1, capacity - 1))}
-                      disabled={capacity <= 1}
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </Button>
-                    <div className="w-20 text-center">
-                      <span className="text-3xl font-bold text-accent">
-                        {capacity}
-                      </span>
-                      <p className="text-xs text-muted-foreground">ports</p>
+                <form.Field
+                  name="totalConnectors"
+                  children={(field) => (
+                    <div className="space-y-3">
+                      <Label>Total Charging Ports *</Label>
+                      <div className="flex items-center gap-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => {
+                            const currentSlots = field.state.value;
+                            if (currentSlots > 1) {
+                              const newCapacity = currentSlots - 1;
+                              if (newCapacity > 0) {
+                                field.handleChange(newCapacity);
+                              }
+                            }
+                          }}
+                          disabled={field.state.value <= 1}
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </Button>
+                        <div className="w-20 text-center">
+                          <span className="text-3xl font-bold text-accent">
+                            {field.state.value}
+                          </span>
+                          <p className="text-xs text-muted-foreground">ports</p>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => {
+                            const currentSlots = field.state.value;
+                            const newCapacity = currentSlots + 1;
+                            field.handleChange(newCapacity);
+                          }}
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => updateCapacity(capacity + 1)}
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
+                  )}
+                />
 
                 {/* Amenities */}
                 <div className="space-y-3">
@@ -663,68 +683,121 @@ export default function AddEvStationFormV2({ states }: Props) {
                 </div>
 
                 {/* Schedule */}
-                <div className="space-y-3">
-                  <Label className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    Operating Hours
-                  </Label>
-                  <div className="space-y-2">
-                    {DAYS.map((day) => (
-                      <motion.div
-                        key={day}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 rounded-xl border-2 transition-colors ${
-                          schedule[day].enabled
-                            ? "border-border"
-                            : "border-border/50 bg-muted/30"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Checkbox
-                            checked={schedule[day].enabled}
-                            onCheckedChange={(checked) =>
-                              updateSchedule(day, "enabled", checked as boolean)
-                            }
-                          />
-                          <span
-                            className={`w-20 sm:w-24 font-medium text-sm sm:text-base ${
-                              !schedule[day].enabled && "text-muted-foreground"
-                            }`}
-                          >
-                            {day.slice(0, 3)}
-                            <span className="hidden sm:inline">
-                              {day.slice(3)}
-                            </span>
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 flex-1 pl-8 sm:pl-0">
-                          <Input
-                            type="time"
-                            value={schedule[day].open}
-                            onChange={(e) =>
-                              updateSchedule(day, "open", e.target.value)
-                            }
-                            disabled={!schedule[day].enabled}
-                            className="flex-1 sm:w-28 sm:flex-none"
-                          />
-                          <span className="text-muted-foreground text-sm">
-                            to
-                          </span>
-                          <Input
-                            type="time"
-                            value={schedule[day].close}
-                            onChange={(e) =>
-                              updateSchedule(day, "close", e.target.value)
-                            }
-                            disabled={!schedule[day].enabled}
-                            className="flex-1 sm:w-28 sm:flex-none"
-                          />
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
+                <form.Field
+                  name="schedule"
+                  mode="array"
+                  children={(field) => (
+                    <div className="space-y-3">
+                      <Label className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        Operating Hours
+                      </Label>
+                      <div className="space-y-2">
+                        {field.state.value.map((day, index) => {
+                          const { isClosed, openingTime, closingTime } = day;
+                          const scheduleDayLabel = DAYS[index];
+                          return (
+                            <motion.div
+                              key={scheduleDayLabel}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className={cn(
+                                `flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 rounded-xl border-2 transition-colors`,
+                                {
+                                  "border-border": !isClosed,
+                                  "border-border/50 bg-muted/50": isClosed,
+                                }
+                              )}
+                            >
+                              <form.Field name={`schedule[${index}].isClosed`}>
+                                {(subField) => (
+                                  <div className="flex items-center gap-3">
+                                    <Checkbox
+                                      checked={subField.state.value}
+                                      onCheckedChange={(checked) => {
+                                        console.log(
+                                          checked,
+                                          index,
+                                          subField.state.value
+                                        );
+                                        subField.handleChange(
+                                          checked as boolean
+                                        );
+                                      }}
+                                    />
+                                    <span
+                                      className={`w-20 sm:w-24 font-medium text-sm sm:text-base ${
+                                        subField.state.value &&
+                                        "text-muted-foreground"
+                                      }`}
+                                    >
+                                      {scheduleDayLabel.slice(0, 3)}
+                                      <span className="hidden sm:inline">
+                                        {scheduleDayLabel.slice(3)}
+                                      </span>
+                                    </span>
+                                  </div>
+                                )}
+                              </form.Field>
+
+                              <div className="flex items-center gap-2 flex-1 pl-8 sm:pl-0">
+                                <form.Field
+                                  name={`schedule[${index}].openingTime`}
+                                >
+                                  {(subField) => (
+                                    <Input
+                                      type="time"
+                                      value={(
+                                        subField.state.value || new Date()
+                                      )
+                                        .toISOString()
+                                        .slice(11, 16)}
+                                      onChange={(e) => {
+                                        if (e.target.valueAsDate)
+                                          subField.handleChange(
+                                            e.target.valueAsDate
+                                          );
+                                      }}
+                                      disabled={isClosed}
+                                      className="flex-1 sm:w-fit sm:flex-none"
+                                    />
+                                  )}
+                                </form.Field>
+
+                                <span className="text-muted-foreground text-sm">
+                                  to
+                                </span>
+
+                                <form.Field
+                                  name={`schedule[${index}].closingTime`}
+                                >
+                                  {(subField) => (
+                                    <Input
+                                      type="time"
+                                      value={(
+                                        subField.state.value || new Date()
+                                      )
+                                        .toISOString()
+                                        .slice(11, 16)}
+                                      onChange={(e) => {
+                                        if (e.target.valueAsDate)
+                                          subField.handleChange(
+                                            e.target.valueAsDate
+                                          );
+                                      }}
+                                      disabled={isClosed}
+                                      className="flex-1 sm:w-fit sm:flex-none"
+                                    />
+                                  )}
+                                </form.Field>
+                              </div>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                />
               </motion.div>
             </Activity>
 
