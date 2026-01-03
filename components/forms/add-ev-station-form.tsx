@@ -31,7 +31,7 @@ export default function AddEVStationForm({ states }: Props) {
       openingTime: new Date(),
       closingTime: new Date(),
       images: [] as File[],
-      totalConnectors: 0,
+      totalSlots: 0,
     } as AddEVSchema,
     validators: {
       onSubmit: ADD_EV_SCHEMA,
@@ -369,7 +369,7 @@ export default function AddEVStationForm({ states }: Props) {
       />
 
       <form.Field
-        name="totalConnectors"
+        name="totalSlots"
         children={(field) => {
           return (
             <div className="space-y-1">

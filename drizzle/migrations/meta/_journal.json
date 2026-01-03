@@ -57,6 +57,13 @@
       "when": 1767196692823,
       "tag": "0007_groovy_sentinel",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1767429213356,
+      "tag": "0008_right_the_leader",
+      "breakpoints": true
     }
   ]
 }

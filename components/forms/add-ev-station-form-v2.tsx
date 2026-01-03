@@ -120,7 +120,7 @@ export default function AddEvStationFormV2({ states, amenities }: Props) {
       address: "",
       city: "",
       state: "",
-      totalConnectors: 1,
+      totalSlots: 1,
       description: "",
       schedule,
       slots: [
@@ -197,33 +197,58 @@ export default function AddEvStationFormV2({ states, amenities }: Props) {
       prev: prevStep,
       next: nextStep,
     };
+
+    // Allow the user to go to the previous step
+    // without validating the current step.
+    if (step === "prev") {
+      await actions[step]();
+      return;
+    }
+
     const values = form.state.values;
 
-    // const currentStepSchema = steps[currentStep - 1];
+    const currentStepSchema = steps[currentStep - 1];
 
-    // const result = currentStepSchema.schema.safeParse(values);
-    // if (!result.success) {
-    //   result.error.issues.forEach((issue) => {
-    //     const field = issue.path[0] as keyof AddEVSchemaV2;
-    //     //  Implement logic to set errors
-    //     form.setFieldMeta(field, (meta) => ({
-    //       ...meta,
-    //       errorMap: {
-    //         onChange: {
-    //           message: issue.message,
-    //         },
-    //       },
-    //       isTouched: true,
-    //     }));
-    //   });
+    const result = currentStepSchema.schema.safeParse(values);
+    clientLogger.info(result);
+    if (!result.success) {
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as keyof AddEVSchemaV2;
+        //  Implement logic to set errors
+        form.setFieldMeta(field, (meta) => ({
+          ...meta,
+          errorMap: {
+            onChange: {
+              message: issue.message,
+            },
+          },
+          isTouched: true,
+        }));
+      });
 
-    //   // Early return to stop from changing page
-    //   return;
-    // }
-    console.log(values);
+      // Early return to stop from changing page
+      return;
+    }
+
+    // Create slots for the next step based on the
+    // total number of slots entered
+    if ("totalSlots" in result.data) {
+      const totalSlots = result.data.totalSlots;
+      const slots: AddEVSchemaV2["slots"] = Array.from(
+        { length: totalSlots },
+        (_, index) => ({
+          connectorType: "",
+          chargingLevel: "",
+          pricePerKwh: 0,
+          maxPower: 0,
+        })
+      );
+      form.setFieldValue("slots", slots);
+    }
+
     await actions[step]();
   };
-  console.log(amenities);
+
   return (
     <div className="max-w-4xl mx-auto">
       {/* Progress Steps */}
@@ -518,7 +543,7 @@ export default function AddEvStationFormV2({ states, amenities }: Props) {
               </motion.div>
             </Activity>
 
-            {/* Step 3: Capacity & Amenities */}
+            {/* Step 2: Capacity & Amenities */}
             <Activity
               mode={currentStep === 2 ? "visible" : "hidden"}
               key="step2"
@@ -543,7 +568,7 @@ export default function AddEvStationFormV2({ states, amenities }: Props) {
 
                 {/* Capacity */}
                 <form.Field
-                  name="totalConnectors"
+                  name="totalSlots"
                   children={(field) => (
                     <div className="space-y-3">
                       <Label>Total Charging Ports *</Label>
@@ -556,9 +581,7 @@ export default function AddEvStationFormV2({ states, amenities }: Props) {
                             const currentSlots = field.state.value;
                             if (currentSlots > 1) {
                               const newCapacity = currentSlots - 1;
-                              if (newCapacity > 0) {
-                                field.handleChange(newCapacity);
-                              }
+                              if (newCapacity) field.handleChange(newCapacity);
                             }
                           }}
                           disabled={field.state.value <= 1}
@@ -648,6 +671,7 @@ export default function AddEvStationFormV2({ states, amenities }: Props) {
                           );
                         })}
                       </div>
+                      <FieldInfo field={field} />
                     </div>
                   )}
                 />
@@ -710,22 +734,25 @@ export default function AddEvStationFormV2({ states, amenities }: Props) {
                                   name={`schedule[${index}].openingTime`}
                                 >
                                   {(subField) => (
-                                    <Input
-                                      type="time"
-                                      value={(
-                                        subField.state.value || new Date()
-                                      )
-                                        .toISOString()
-                                        .slice(11, 16)}
-                                      onChange={(e) => {
-                                        if (e.target.valueAsDate)
-                                          subField.handleChange(
-                                            e.target.valueAsDate
-                                          );
-                                      }}
-                                      disabled={isClosed}
-                                      className="flex-1 sm:w-fit sm:flex-none"
-                                    />
+                                    <div className="space-y-2">
+                                      <Input
+                                        type="time"
+                                        value={(
+                                          subField.state.value || new Date()
+                                        )
+                                          .toISOString()
+                                          .slice(11, 16)}
+                                        onChange={(e) => {
+                                          if (e.target.valueAsDate)
+                                            subField.handleChange(
+                                              e.target.valueAsDate
+                                            );
+                                        }}
+                                        disabled={isClosed}
+                                        className="flex-1 sm:w-fit sm:flex-none"
+                                      />
+                                      <FieldInfo field={subField} />
+                                    </div>
                                   )}
                                 </form.Field>
 
@@ -737,22 +764,25 @@ export default function AddEvStationFormV2({ states, amenities }: Props) {
                                   name={`schedule[${index}].closingTime`}
                                 >
                                   {(subField) => (
-                                    <Input
-                                      type="time"
-                                      value={(
-                                        subField.state.value || new Date()
-                                      )
-                                        .toISOString()
-                                        .slice(11, 16)}
-                                      onChange={(e) => {
-                                        if (e.target.valueAsDate)
-                                          subField.handleChange(
-                                            e.target.valueAsDate
-                                          );
-                                      }}
-                                      disabled={isClosed}
-                                      className="flex-1 sm:w-fit sm:flex-none"
-                                    />
+                                    <div className="spce-y-2">
+                                      <Input
+                                        type="time"
+                                        value={(
+                                          subField.state.value || new Date()
+                                        )
+                                          .toISOString()
+                                          .slice(11, 16)}
+                                        onChange={(e) => {
+                                          if (e.target.valueAsDate)
+                                            subField.handleChange(
+                                              e.target.valueAsDate
+                                            );
+                                        }}
+                                        disabled={isClosed}
+                                        className="flex-1 sm:w-fit sm:flex-none"
+                                      />
+                                      <FieldInfo field={subField} />
+                                    </div>
                                   )}
                                 </form.Field>
                               </div>
@@ -831,7 +861,7 @@ export default function AddEvStationFormV2({ states, amenities }: Props) {
                                           subField.handleChange(type.id)
                                         }
                                         className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm transition-all ${
-                                          port.connectorType === type.id
+                                          subField.state.value === type.id
                                             ? "bg-accent text-accent-foreground"
                                             : "bg-muted hover:bg-muted/80"
                                         }`}
@@ -840,6 +870,7 @@ export default function AddEvStationFormV2({ states, amenities }: Props) {
                                       </motion.button>
                                     ))}
                                   </div>
+                                  <FieldInfo field={subField} />
                                 </div>
                               )}
                             />
@@ -880,6 +911,7 @@ export default function AddEvStationFormV2({ states, amenities }: Props) {
                                       </motion.button>
                                     ))}
                                   </div>
+                                  <FieldInfo field={subField} />
                                 </div>
                               )}
                             />
@@ -900,14 +932,15 @@ export default function AddEvStationFormV2({ states, amenities }: Props) {
                                         step="0.1"
                                         placeholder="150"
                                         value={subField.state.value}
-                                        onChange={(e) =>
+                                        onChange={(e) => {
                                           subField.handleChange(
-                                            e.target.valueAsNumber
-                                          )
-                                        }
+                                            e.target.valueAsNumber || 0
+                                          );
+                                        }}
                                         className="pl-10"
                                       />
                                     </div>
+                                    <FieldInfo field={subField} />
                                   </div>
                                 )}
                               />
@@ -925,12 +958,13 @@ export default function AddEvStationFormV2({ states, amenities }: Props) {
                                       step="0.01"
                                       placeholder="0.35"
                                       value={subField.state.value}
-                                      onChange={(e) =>
+                                      onChange={(e) => {
                                         subField.handleChange(
-                                          e.target.valueAsNumber
-                                        )
-                                      }
+                                          e.target.valueAsNumber || 0
+                                        );
+                                      }}
                                     />
+                                    <FieldInfo field={subField} />
                                   </div>
                                 )}
                               />

@@ -70,7 +70,7 @@ export const evStations = pgTable("ev_stations", {
   latitude: decimal("latitude", { precision: 10, scale: 7 }),
   longitude: decimal("longitude", { precision: 10, scale: 7 }),
   description: varchar("description", { length: 1024 }),
-  totalConnectors: smallint("total_connectors").notNull().default(1),
+  totalSlots: smallint("total_slots").notNull().default(1),
   openingTime: varchar("opening_time", { length: 5 }),
   closingTime: varchar("closing_time", { length: 5 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),

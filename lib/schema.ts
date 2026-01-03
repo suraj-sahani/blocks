@@ -98,7 +98,7 @@ export const PARKING_AREA_SLOT_SCHEMA = z.object({
 
 ////////////////// ADD EV STATION SCHEMA ////////////////////
 export const EV_STATION_CAPACITY_AND_SCHEDULE_SCHEMA = z.object({
-  totalConnectors: z
+  totalSlots: z
     .number({ error: "Total connectors is required." })
     .min(1, { error: "Total connectors must be a minimun of 1" }),
   amenities: z.array(z.uuid()).optional(),
@@ -176,7 +176,7 @@ export const ADD_EV_SCHEMA = z.object({
   openingTime: z.date({ error: "Opening Time is required." }),
   closingTime: z.date({ error: "Closing time is required." }),
   images: z.array(z.file()).optional(),
-  totalConnectors: z
+  totalSlots: z
     .number({ error: "Total connectors is required." })
     .min(1, { error: "Total connectors must be a minimun of 1" }),
 });

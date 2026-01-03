@@ -137,7 +137,7 @@ export const addEVStation = async (data: AddEVSchema) => {
       openingTime,
       latitude,
       longitude,
-      totalConnectors,
+      totalSlots,
       images,
     } = dataClone;
 
@@ -160,7 +160,7 @@ export const addEVStation = async (data: AddEVSchema) => {
       }),
       latitude: latitude.toString(),
       longitude: longitude.toString(),
-      totalConnectors,
+      totalSlots,
     };
 
     const existingEVStation = await db
