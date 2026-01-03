@@ -17,11 +17,14 @@ import {
   Shield,
   ShieldPlus,
   ShoppingBag,
+  Toilet,
   Umbrella,
+  Users,
   Waves,
   Wifi,
   Zap,
 } from "lucide-react";
+import { EVChargingLevels, EVConnectorTypes } from "./types";
 
 export const IMAGEKIT_FOLDERS = {
   parking: "/blocks/parking_areas",
@@ -297,34 +300,87 @@ export const listings = [
   },
 ];
 
-export const iconMappings = [
-  { name: "Security Camera", icon: Cctv },
-  { name: "24/7 Access", icon: CalendarCheck },
-  { name: "EV Charging", icon: PlugZap },
-  { name: "Covered Parking", icon: Umbrella },
-  { name: "Wheelchair Access", icon: Accessibility },
-  { name: "Public Transport", icon: Bus },
-  { name: "Well Lit", icon: LampCeiling },
-  { name: "Valet Service", icon: ConciergeBell },
-  { name: "Car Wash", icon: Waves },
-  { name: "Mall Access", icon: Mailbox },
-  { name: "Weather Protected", icon: Umbrella },
-  { name: "Shuttle Service", icon: Car },
-  { name: "Security Patrol", icon: ShieldPlus },
-  { name: "Luggage Help", icon: Luggage },
-  { name: "Smart Parking", icon: Car },
-  { name: "WiFi Access", icon: Wifi },
-  { name: "24/7 Security", icon: Shield },
-  { name: "Fast Charging", icon: Zap },
-  { name: "Cafe", icon: Coffee },
-  { name: "Secure Payment", icon: CreditCard },
-  { name: "Shopping Access", icon: ShoppingBag },
-  { name: "Ultra-Fast", icon: FastForward },
-  { name: "Battery Service", icon: Battery },
-  { name: "Multiple Plugs", icon: Plug },
-  { name: "Solar Powered", icon: Zap },
-  { name: "Premium Lounge", icon: Coffee },
-  { name: "Battery Health Check", icon: Battery },
-  { name: "Workspace", icon: Plug },
-  { name: "Secure Access", icon: Shield },
+export const iconMappings = {
+  Restrooms: { icon: Toilet },
+  "24/7 Access": { icon: CalendarCheck },
+  "Security Cameras": { icon: Cctv },
+  "On-Site Security": { icon: Shield },
+  "Covered Parking": { icon: Umbrella },
+  "Well-Lit Area": { icon: LampCeiling },
+  "EV Fast Charging": { icon: Zap },
+  "EV Standard Charging": { icon: FastForward },
+  "Wheelchair Accessible": { icon: Accessibility },
+  "Mobile Payment": { icon: CreditCard },
+  "Payment Kiosk": { icon: CreditCard },
+  "Waiting Area": { icon: Users },
+  "Café or Vending": { icon: Coffee },
+  "Wi-Fi": { icon: Wifi },
+  "Car Wash Nearby": { icon: Waves },
+};
+
+export const DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+export const CONNECTOR_TYPES = [
+  {
+    id: EVConnectorTypes.ComboCcs1,
+    label: "CCS-1",
+    description: "Combined Charging System 1",
+  },
+  {
+    id: EVConnectorTypes.ComboCcs2,
+    label: "CCS-2",
+    description: "Combined Charging System 2",
+  },
+  {
+    id: EVConnectorTypes.Chademo,
+    label: "CHAdeMO",
+    description: "DC Fast Charging",
+  },
+  {
+    id: EVConnectorTypes.Tesla,
+    label: "Tesla",
+    description: "Tesla Supercharger",
+  },
+  { id: EVConnectorTypes.J1772, label: "J1772", description: "Level 1 & 2" },
+  {
+    id: EVConnectorTypes.Type2,
+    label: "Type 2",
+    description: "European Standard",
+  },
+  {
+    id: EVConnectorTypes.Type1,
+    label: "Type 1",
+    description: "North American",
+  },
+  { id: EVConnectorTypes.Nacs, label: "NACS", description: "North American" },
+  { id: EVConnectorTypes.Other, label: "Other", description: "Other" },
+];
+
+export const CHARGER_LEVELS = [
+  {
+    id: EVChargingLevels.Level1,
+    label: "Level 1",
+    power: "2-5 kW",
+    description: "120V AC - Slow charging",
+  },
+  {
+    id: EVChargingLevels.Level2,
+    label: "Level 2",
+    power: "7-22 kW",
+    description: "240V AC - Medium speed",
+  },
+  {
+    id: EVChargingLevels.DcFast,
+    label: "Level 3 / DC Fast",
+    power: "50-350 kW",
+    description: "480V DC - Rapid charging",
+  },
 ];

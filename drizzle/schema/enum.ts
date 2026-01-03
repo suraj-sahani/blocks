@@ -17,6 +17,8 @@ export const evConnectorTypeEnum = pgEnum("ev_connector_type", [
   "combo_ccs_2", // CCS Type 2
   "chademo", // Japan
   "tesla_supercharger", // Tesla specific (often proprietary)
+  "nacs",
+  "j1772",
   "other",
 ]);
 

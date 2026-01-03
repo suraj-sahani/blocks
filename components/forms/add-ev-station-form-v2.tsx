@@ -4,6 +4,12 @@ import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  CHARGER_LEVELS,
+  CONNECTOR_TYPES,
+  DAYS,
+  iconMappings,
+} from "@/lib/constants";
 import clientLogger from "@/lib/pino/client";
 import {
   ADD_EV_SCHEMA_V2,
@@ -11,7 +17,8 @@ import {
   EV_STATION_CAPACITY_AND_SCHEDULE_SCHEMA,
   EV_STATION_SLOT_SCHEMA,
 } from "@/lib/schema";
-import { AddEVSchemaV2, City, State } from "@/lib/types";
+import { AddEVSchemaV2, Amenities, City, State } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -23,43 +30,12 @@ import {
   Plus,
   Zap,
 } from "lucide-react";
-import { AnimatePresence, m, motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { Activity, useState } from "react";
 import { FieldInfo } from ".";
 import AddressSearch from "../address-search";
 import { AutoComplete } from "../ui/auto-complete";
 import ImageUpload from "../upload";
-import { cn } from "@/lib/utils";
-
-const CONNECTOR_TYPES = [
-  { id: "ccs", label: "CCS", description: "Combined Charging System" },
-  { id: "chademo", label: "CHAdeMO", description: "DC Fast Charging" },
-  { id: "tesla", label: "Tesla", description: "Tesla Supercharger" },
-  { id: "j1772", label: "J1772", description: "Level 1 & 2" },
-  { id: "type2", label: "Type 2", description: "European Standard" },
-  { id: "nacs", label: "NACS", description: "North American" },
-];
-
-const CHARGER_LEVELS = [
-  {
-    id: "level1",
-    label: "Level 1",
-    power: "2-5 kW",
-    description: "120V AC - Slow charging",
-  },
-  {
-    id: "level2",
-    label: "Level 2",
-    power: "7-22 kW",
-    description: "240V AC - Medium speed",
-  },
-  {
-    id: "level3",
-    label: "Level 3 / DC Fast",
-    power: "50-350 kW",
-    description: "480V DC - Rapid charging",
-  },
-];
 
 const AMENITIES = [
   "Covered Area",
@@ -74,16 +50,6 @@ const AMENITIES = [
   "Wheelchair Accessible",
   "Pet Friendly",
   "Food Nearby",
-];
-
-const DAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
 ];
 
 const schedule = [
@@ -140,21 +106,10 @@ interface ChargingPort {
 }
 type Props = {
   states: State[];
+  amenities: Amenities[];
 };
-export default function AddEvStationFormV2({ states }: Props) {
+export default function AddEvStationFormV2({ states, amenities }: Props) {
   const [currentStep, setCurrentStep] = useState(1);
-
-  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
-
-  const [chargingPorts, setChargingPorts] = useState<ChargingPort[]>([
-    {
-      id: 1,
-      connectorType: "ccs",
-      chargerLevel: "level2",
-      maxPower: "",
-      pricePerKwh: "",
-    },
-  ]);
 
   const form = useForm({
     validators: {
@@ -168,9 +123,10 @@ export default function AddEvStationFormV2({ states }: Props) {
       totalConnectors: 1,
       description: "",
       schedule,
-      connectors: [
+      slots: [
         {
-          vehicleTypes: [],
+          connectorType: "",
+          charginLevel: "",
           priceKwPerHour: 0,
           maxPower: 0,
         },
@@ -233,20 +189,6 @@ export default function AddEvStationFormV2({ states }: Props) {
     },
   ];
 
-  const toggleAmenity = (amenity: string) => {
-    setSelectedAmenities((prev) =>
-      prev.includes(amenity)
-        ? prev.filter((a) => a !== amenity)
-        : [...prev, amenity]
-    );
-  };
-
-  const updatePort = (id: number, field: keyof ChargingPort, value: string) => {
-    setChargingPorts((prev) =>
-      prev.map((port) => (port.id === id ? { ...port, [field]: value } : port))
-    );
-  };
-
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 3));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
@@ -281,7 +223,7 @@ export default function AddEvStationFormV2({ states }: Props) {
     console.log(values);
     await actions[step]();
   };
-
+  console.log(amenities);
   return (
     <div className="max-w-4xl mx-auto">
       {/* Progress Steps */}
@@ -647,40 +589,68 @@ export default function AddEvStationFormV2({ states }: Props) {
                 />
 
                 {/* Amenities */}
-                <div className="space-y-3">
-                  <Label>Amenities</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {AMENITIES.map((amenity) => (
-                      <motion.button
-                        key={amenity}
-                        type="button"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => toggleAmenity(amenity)}
-                        className={`p-3 rounded-xl border-2 text-left transition-all ${
-                          selectedAmenities.includes(amenity)
-                            ? "border-accent bg-accent/10 text-accent"
-                            : "border-border hover:border-accent/50"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
+                <form.Field
+                  name="amenities"
+                  children={(field) => (
+                    <div className="space-y-3">
+                      <Label>Amenities</Label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {amenities.map((amenity) => {
+                          const Icon =
+                            iconMappings?.[
+                              amenity.name as keyof typeof iconMappings
+                            ]?.icon;
+                          return (
+                            <motion.button
+                              key={amenity.id}
+                              type="button"
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => {
+                                const currentAmenities =
+                                  field.state.value || [];
+                                const newAmenities = currentAmenities.includes(
+                                  amenity.id
+                                )
+                                  ? currentAmenities.filter(
+                                      (id) => id !== amenity.id
+                                    )
+                                  : [...currentAmenities, amenity.id];
+
+                                console.log(newAmenities);
+                                field.handleChange(newAmenities);
+                              }}
+                              className={`p-3 rounded-xl border-2 text-left transition-all ${
+                                (field.state.value || []).includes(amenity.id)
+                                  ? "border-primary/50 bg-primary/10 text-primary"
+                                  : "border-border hover:border-accent/50"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                {Icon ? <Icon className="size-4" /> : null}
+                                <span className="text-sm font-medium">
+                                  {amenity.name}
+                                </span>
+                              </div>
+                              {/* 
                           <div
                             className={`w-5 h-5 rounded-md flex items-center justify-center ${
-                              selectedAmenities.includes(amenity)
+                              selectedAmenities.includes(amenity.id)
                                 ? "bg-accent text-accent-foreground"
                                 : "border-2 border-border"
                             }`}
                           >
-                            {selectedAmenities.includes(amenity) && (
+                            {selectedAmenities.includes(amenity.id) && (
                               <Check className="w-3 h-3" />
                             )}
-                          </div>
-                          <span className="text-sm font-medium">{amenity}</span>
-                        </div>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
+                          </div> */}
+                            </motion.button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                />
 
                 {/* Schedule */}
                 <form.Field
@@ -694,7 +664,7 @@ export default function AddEvStationFormV2({ states }: Props) {
                       </Label>
                       <div className="space-y-2">
                         {field.state.value.map((day, index) => {
-                          const { isClosed, openingTime, closingTime } = day;
+                          const { isClosed } = day;
                           const scheduleDayLabel = DAYS[index];
                           return (
                             <motion.div
@@ -715,11 +685,6 @@ export default function AddEvStationFormV2({ states }: Props) {
                                     <Checkbox
                                       checked={subField.state.value}
                                       onCheckedChange={(checked) => {
-                                        console.log(
-                                          checked,
-                                          index,
-                                          subField.state.value
-                                        );
                                         subField.handleChange(
                                           checked as boolean
                                         );
@@ -824,128 +789,158 @@ export default function AddEvStationFormV2({ states }: Props) {
                   </p>
                 </div>
 
-                <div className="grid gap-4">
-                  {chargingPorts.map((port, index) => (
-                    <motion.div
-                      key={port.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="p-3 sm:p-4 rounded-xl border-2 border-border hover:border-accent/30 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                          <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
-                        </div>
-                        <h4 className="font-semibold text-sm sm:text-base">
-                          Charging Port #{port.id}
-                        </h4>
-                      </div>
-
-                      <div className="grid gap-4">
-                        {/* Connector Type */}
-                        <div className="space-y-2">
-                          <Label className="text-sm">Connector Type</Label>
-                          <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                            {CONNECTOR_TYPES.map((type) => (
-                              <motion.button
-                                key={type.id}
-                                type="button"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() =>
-                                  updatePort(port.id, "connectorType", type.id)
-                                }
-                                className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm transition-all ${
-                                  port.connectorType === type.id
-                                    ? "bg-accent text-accent-foreground"
-                                    : "bg-muted hover:bg-muted/80"
-                                }`}
-                              >
-                                {type.label}
-                              </motion.button>
-                            ))}
+                <form.Field
+                  name="slots"
+                  mode="array"
+                  children={(field) => (
+                    <div className="grid gap-4">
+                      {field.state.value.map((port, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="p-3 sm:p-4 rounded-xl border-2 border-border hover:border-accent/30 transition-colors"
+                        >
+                          <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
+                            </div>
+                            <h4 className="font-semibold text-sm sm:text-base">
+                              Charging Port #{index + 1}
+                            </h4>
                           </div>
-                        </div>
 
-                        {/* Charger Level */}
-                        <div className="space-y-2">
-                          <Label className="text-sm">Charger Level</Label>
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                            {CHARGER_LEVELS.map((level) => (
-                              <motion.button
-                                key={level.id}
-                                type="button"
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={() =>
-                                  updatePort(port.id, "chargerLevel", level.id)
-                                }
-                                className={`p-2.5 sm:p-3 rounded-lg text-left transition-all ${
-                                  port.chargerLevel === level.id
-                                    ? "bg-accent/10 border-2 border-accent"
-                                    : "bg-muted border-2 border-transparent hover:bg-muted/80"
-                                }`}
-                              >
-                                <div className="font-medium text-sm">
-                                  {level.label}
+                          <div className="grid gap-4">
+                            {/* Connector Type */}
+                            <form.Field
+                              name={`slots[${index}].connectorType`}
+                              children={(subField) => (
+                                <div className="space-y-2">
+                                  <Label className="text-sm">
+                                    Connector Type
+                                  </Label>
+                                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                                    {CONNECTOR_TYPES.map((type) => (
+                                      <motion.button
+                                        key={type.id}
+                                        type="button"
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={() =>
+                                          subField.handleChange(type.id)
+                                        }
+                                        className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm transition-all ${
+                                          port.connectorType === type.id
+                                            ? "bg-accent text-accent-foreground"
+                                            : "bg-muted hover:bg-muted/80"
+                                        }`}
+                                      >
+                                        {type.label}
+                                      </motion.button>
+                                    ))}
+                                  </div>
                                 </div>
-                                <div className="text-xs text-muted-foreground">
-                                  {level.power}
-                                </div>
-                                <div className="text-xs text-muted-foreground mt-1 hidden sm:block">
-                                  {level.description}
-                                </div>
-                              </motion.button>
-                            ))}
-                          </div>
-                        </div>
+                              )}
+                            />
 
-                        <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                          {/* Max Power */}
-                          <div className="space-y-2">
-                            <Label className="text-sm">Max Power (kW)</Label>
-                            <div className="relative">
-                              <Zap className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                              <Input
-                                type="number"
-                                step="0.1"
-                                placeholder="150"
-                                value={port.maxPower}
-                                onChange={(e) =>
-                                  updatePort(
-                                    port.id,
-                                    "maxPower",
-                                    e.target.value
-                                  )
-                                }
-                                className="pl-10"
+                            {/* Charger Level */}
+                            <form.Field
+                              name={`slots[${index}].chargingLevel`}
+                              children={(subField) => (
+                                <div className="space-y-2">
+                                  <Label className="text-sm">
+                                    Charger Level
+                                  </Label>
+                                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                    {CHARGER_LEVELS.map((level) => (
+                                      <motion.button
+                                        key={level.id}
+                                        type="button"
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={() =>
+                                          subField.handleChange(level.id)
+                                        }
+                                        className={`p-2.5 sm:p-3 rounded-lg text-left transition-all ${
+                                          subField.state.value === level.id
+                                            ? "bg-accent/10 border-2 border-accent"
+                                            : "bg-muted border-2 border-transparent hover:bg-muted/80"
+                                        }`}
+                                      >
+                                        <div className="font-medium text-sm">
+                                          {level.label}
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">
+                                          {level.power}
+                                        </div>
+                                        <div className="text-xs text-muted-foreground mt-1 hidden sm:block">
+                                          {level.description}
+                                        </div>
+                                      </motion.button>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            />
+
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                              {/* Max Power */}
+                              <form.Field
+                                name={`slots[${index}].maxPower`}
+                                children={(subField) => (
+                                  <div className="space-y-2">
+                                    <Label className="text-sm">
+                                      Max Power (kW)
+                                    </Label>
+                                    <div className="relative">
+                                      <Zap className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                      <Input
+                                        type="number"
+                                        step="0.1"
+                                        placeholder="150"
+                                        value={subField.state.value}
+                                        onChange={(e) =>
+                                          subField.handleChange(
+                                            e.target.valueAsNumber
+                                          )
+                                        }
+                                        className="pl-10"
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+                              />
+
+                              {/* Price per kWh */}
+                              <form.Field
+                                name={`slots[${index}].pricePerKwh`}
+                                children={(subField) => (
+                                  <div className="space-y-2">
+                                    <Label className="text-sm">
+                                      Price/kWh ($)
+                                    </Label>
+                                    <Input
+                                      type="number"
+                                      step="0.01"
+                                      placeholder="0.35"
+                                      value={subField.state.value}
+                                      onChange={(e) =>
+                                        subField.handleChange(
+                                          e.target.valueAsNumber
+                                        )
+                                      }
+                                    />
+                                  </div>
+                                )}
                               />
                             </div>
                           </div>
-
-                          {/* Price per kWh */}
-                          <div className="space-y-2">
-                            <Label className="text-sm">Price/kWh ($)</Label>
-                            <Input
-                              type="number"
-                              step="0.01"
-                              placeholder="0.35"
-                              value={port.pricePerKwh}
-                              onChange={(e) =>
-                                updatePort(
-                                  port.id,
-                                  "pricePerKwh",
-                                  e.target.value
-                                )
-                              }
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+                />
 
                 {/* Quick Actions */}
                 <div className="p-4 rounded-xl bg-muted/50 space-y-3">
@@ -956,14 +951,11 @@ export default function AddEvStationFormV2({ states }: Props) {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        const firstPort = chargingPorts[0];
-                        setChargingPorts((prev) =>
-                          prev.map((p) => ({
-                            ...p,
-                            pricePerKwh: firstPort.pricePerKwh,
-                            maxPower: firstPort.maxPower,
-                          }))
-                        );
+                        const firstPort = form.state.values.slots[0];
+                        form.setFieldValue("slots", [
+                          ...form.state.values.slots.slice(1),
+                          firstPort,
+                        ]);
                       }}
                     >
                       Apply first port pricing to all
@@ -973,14 +965,15 @@ export default function AddEvStationFormV2({ states }: Props) {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        const firstPort = chargingPorts[0];
-                        setChargingPorts((prev) =>
-                          prev.map((p) => ({
-                            ...p,
-                            connectorType: firstPort.connectorType,
-                            chargerLevel: firstPort.chargerLevel,
-                          }))
-                        );
+                        const firstPort = form.state.values.slots[0];
+                        const allSlots = form.state.values.slots;
+                        const updatedSlots = allSlots.map((slot) => ({
+                          ...slot,
+                          connectorType: firstPort.connectorType,
+                          chargerLevel: firstPort.chargingLevel,
+                        }));
+
+                        form.setFieldValue("slots", updatedSlots);
                       }}
                     >
                       Apply first port config to all

@@ -1,5 +1,5 @@
 import { db } from "@/drizzle/db";
-import { states } from "@/drizzle/schema";
+import { amenities, states } from "@/drizzle/schema";
 import { errorHandler } from "../utils";
 
 export const getAllStates = async () => {
@@ -11,6 +11,16 @@ export const getAllStates = async () => {
         abbreviation: states.abbreviation,
       })
       .from(states);
+    return res;
+  } catch (error) {
+    const errMsg = errorHandler(error, "Failed to fetch states.");
+    throw new Error(errMsg);
+  }
+};
+
+export const getAllAmenities = async () => {
+  try {
+    const res = await db.select().from(amenities);
     return res;
   } catch (error) {
     const errMsg = errorHandler(error, "Failed to fetch states.");

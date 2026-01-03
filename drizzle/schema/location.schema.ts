@@ -5,7 +5,6 @@ import {
   integer,
   pgEnum,
   pgTable,
-  primaryKey,
   smallint,
   text,
   time,
@@ -15,13 +14,13 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { evChargingBookings, parkingBookings } from "./booking.schema";
-import { users } from "./user.schema";
 import {
   evChargingLevelEnum,
   evConnectorTypeEnum,
   parkingSlotTypeEnum,
   vehicleBodyTypeEnum,
 } from "./enum";
+import { users } from "./user.schema";
 
 export const dayOfWeekEnum = pgEnum("day_of_week", [
   "sunday",

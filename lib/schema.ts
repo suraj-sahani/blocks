@@ -113,10 +113,15 @@ export const EV_STATION_CAPACITY_AND_SCHEDULE_SCHEMA = z.object({
 });
 
 export const EV_STATION_SLOT_SCHEMA = z.object({
-  connectors: z.array(
+  slots: z.array(
     z.object({
-      vehicleTypes: z.array(z.uuid()),
-      priceKwPerHour: z
+      connectorType: z
+        .string()
+        .min(1, { error: "Connector type is required." }),
+      chargingLevel: z
+        .string()
+        .min(1, { error: "Charging level is required." }),
+      pricePerKwh: z
         .number({ error: "Price per hour is required." })
         .min(1, { error: "Price per hour must be a minimun of $1" }),
       maxPower: z
