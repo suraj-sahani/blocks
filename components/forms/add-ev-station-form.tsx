@@ -56,44 +56,44 @@ const schedule = [
   {
     dayOfWeek: 0,
     isClosed: false,
-    open: new Date(),
-    close: new Date(),
+    openingTime: new Date(),
+    closingTime: new Date(),
   },
   {
     dayOfWeek: 1,
     isClosed: false,
-    open: new Date(),
-    close: new Date(),
+    openingTime: new Date(),
+    closingTime: new Date(),
   },
   {
     dayOfWeek: 2,
     isClosed: false,
-    open: new Date(),
-    close: new Date(),
+    openingTime: new Date(),
+    closingTime: new Date(),
   },
   {
     dayOfWeek: 3,
     isClosed: false,
-    open: new Date(),
-    close: new Date(),
+    openingTime: new Date(),
+    closingTime: new Date(),
   },
   {
     dayOfWeek: 4,
     isClosed: false,
-    open: new Date(),
-    close: new Date(),
+    openingTime: new Date(),
+    closingTime: new Date(),
   },
   {
     dayOfWeek: 5,
     isClosed: false,
-    open: new Date(),
-    close: new Date(),
+    openingTime: new Date(),
+    closingTime: new Date(),
   },
   {
     dayOfWeek: 6,
     isClosed: false,
-    open: new Date(),
-    close: new Date(),
+    openingTime: new Date(),
+    closingTime: new Date(),
   },
 ];
 
@@ -217,6 +217,11 @@ export default function AddEVStationForm({ states, amenities }: Props) {
           },
           isTouched: true,
         }));
+      });
+
+      clientLogger.info({
+        errors: form.state.errors,
+        values: form.state.values,
       });
 
       // Early return to stop from changing page
@@ -633,7 +638,6 @@ export default function AddEVStationForm({ states, amenities }: Props) {
                                     )
                                   : [...currentAmenities, amenity.id];
 
-                                console.log(newAmenities);
                                 field.handleChange(newAmenities);
                               }}
                               className={`p-3 rounded-xl border-2 text-left transition-all ${
@@ -648,18 +652,6 @@ export default function AddEVStationForm({ states, amenities }: Props) {
                                   {amenity.name}
                                 </span>
                               </div>
-                              {/* 
-                          <div
-                            className={`w-5 h-5 rounded-md flex items-center justify-center ${
-                              selectedAmenities.includes(amenity.id)
-                                ? "bg-accent text-accent-foreground"
-                                : "border-2 border-border"
-                            }`}
-                          >
-                            {selectedAmenities.includes(amenity.id) && (
-                              <Check className="w-3 h-3" />
-                            )}
-                          </div> */}
                             </motion.button>
                           );
                         })}
@@ -979,10 +971,14 @@ export default function AddEVStationForm({ states, amenities }: Props) {
                       size="sm"
                       onClick={() => {
                         const firstPort = form.state.values.slots[0];
-                        form.setFieldValue("slots", [
-                          ...form.state.values.slots.slice(1),
-                          firstPort,
-                        ]);
+                        const firstPortPerKwhPrice = firstPort.pricePerKwh;
+                        const portsWithSamePrice = form.state.values.slots.map(
+                          (slot) => ({
+                            ...slot,
+                            pricePerKwh: firstPortPerKwhPrice,
+                          })
+                        );
+                        form.setFieldValue("slots", portsWithSamePrice);
                       }}
                     >
                       Apply first port pricing to all
@@ -995,9 +991,7 @@ export default function AddEVStationForm({ states, amenities }: Props) {
                         const firstPort = form.state.values.slots[0];
                         const allSlots = form.state.values.slots;
                         const updatedSlots = allSlots.map((slot) => ({
-                          ...slot,
-                          connectorType: firstPort.connectorType,
-                          chargerLevel: firstPort.chargingLevel,
+                          ...firstPort,
                         }));
 
                         form.setFieldValue("slots", updatedSlots);
