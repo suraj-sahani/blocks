@@ -1,10 +1,11 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   decimal,
   integer,
   pgEnum,
   pgTable,
+  primaryKey,
   smallint,
   text,
   time,
@@ -14,12 +15,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { evChargingBookings, parkingBookings } from "./booking.schema";
-import {
-  evChargingLevelEnum,
-  evConnectorTypeEnum,
-  parkingSlotTypeEnum,
-  vehicleBodyTypeEnum,
-} from "./enum";
+import { evChargingLevelEnum, evConnectorTypeEnum } from "./enum";
 import { users } from "./user.schema";
 
 export const dayOfWeekEnum = pgEnum("day_of_week", [
@@ -31,6 +27,21 @@ export const dayOfWeekEnum = pgEnum("day_of_week", [
   "friday",
   "saturday",
 ]);
+
+export const vehicleTypes = pgTable("vehicle_types", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: varchar("name", { length: 256 }).unique().notNull(),
+  description: varchar("description", { length: 512 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export const vehicleTypesRelations = relations(vehicleTypes, ({ many }) => ({
+  parkingSlotVehicleTypes: many(parkingSlotVehicleTypes), // Link to join table
+}));
 
 export const parkingAreas = pgTable("parking_areas", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -250,21 +261,27 @@ export const evChargingSlotsRelations = relations(
   })
 );
 
-export const parkingSlots = pgTable("parking_slots", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  parkingAreaId: uuid("parking_area_id")
-    .notNull()
-    .references(() => parkingAreas.id, { onDelete: "cascade" }),
-  slotNumber: varchar("slot_number", { length: 20 }).notNull(),
-  floor: varchar("floor", { length: 10 }),
-  type: parkingSlotTypeEnum("type").notNull().default("standard"),
-  // Removed isAvailable column
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => /* @__PURE__ */ new Date())
-    .notNull(),
-});
+export const parkingSlots = pgTable(
+  "parking_slots",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    parkingAreaId: uuid("parking_area_id")
+      .notNull()
+      .references(() => parkingAreas.id, { onDelete: "cascade" }),
+    slotNumber: varchar("slot_number", { length: 20 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("unq_parking_area_slot_number").on(
+      table.parkingAreaId,
+      table.slotNumber
+    ),
+  ]
+);
 
 export const parkingSlotsRelations = relations(
   parkingSlots,
@@ -273,34 +290,61 @@ export const parkingSlotsRelations = relations(
       fields: [parkingSlots.parkingAreaId],
       references: [parkingAreas.id],
     }),
-    prices: many(parkingSlotPrices),
+
     parkingBookings: many(parkingBookings),
+    parkingSlotVehicleTypes: many(parkingSlotVehicleTypes),
   })
 );
 
-export const parkingSlotPrices = pgTable("parking_slot_prices", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  parkingSlotId: uuid("parking_slot_id")
-    .notNull()
-    .references(() => parkingSlots.id, { onDelete: "cascade" }),
-  vehicleBodyType: vehicleBodyTypeEnum("vehicle_body_type").notNull(),
-  pricePerHour: decimal("price_per_hour", {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => /* @__PURE__ */ new Date())
-    .notNull(),
-});
+export const parkingSlotVehicleTypes = pgTable(
+  "parking_slot_vehicle_types",
+  {
+    parkingSlotId: uuid("parking_slot_id")
+      .notNull()
+      .references(() => parkingSlots.id, { onDelete: "cascade" }),
+    vehicleTypeId: uuid("vehicle_type_id") // NEW: References the vehicleTypes table
+      .notNull()
+      .references(() => vehicleTypes.id, { onDelete: "cascade" }),
 
-export const parkingSlotPricesRelations = relations(
-  parkingSlotPrices,
+    // NEW 2: Pricing for this specific slot-vehicle type combination
+    pricePerHour: decimal("price_per_hour", {
+      precision: 10,
+      scale: 2,
+    }).notNull(),
+    pricePerDay: decimal("price_per_day", { precision: 10, scale: 2 }).default(
+      "0.00"
+    ), // Default to 0 if not set
+    pricePerWeek: decimal("price_per_week", {
+      precision: 10,
+      scale: 2,
+    }).default("0.00"),
+    pricePerMonth: decimal("price_per_month", {
+      precision: 10,
+      scale: 2,
+    }).default("0.00"),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.parkingSlotId, table.vehicleTypeId] }),
+  ]
+);
+
+// NEW: parkingSlotVehicleTypesRelations
+export const parkingSlotVehicleTypesRelations = relations(
+  parkingSlotVehicleTypes,
   ({ one }) => ({
     parkingSlot: one(parkingSlots, {
-      fields: [parkingSlotPrices.parkingSlotId],
+      fields: [parkingSlotVehicleTypes.parkingSlotId],
       references: [parkingSlots.id],
+    }),
+    vehicleType: one(vehicleTypes, {
+      fields: [parkingSlotVehicleTypes.vehicleTypeId],
+      references: [vehicleTypes.id],
     }),
   })
 );
@@ -356,15 +400,12 @@ export const parkingAreaSchedules = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (table) => {
-    return {
-      // Enforce unique schedule per parking area per day
-      unqParkingAreaDay: uniqueIndex("unq_parking_area_day").on(
-        table.parkingAreaId,
-        table.dayOfWeek
-      ),
-    };
-  }
+  (table) => [
+    uniqueIndex("unq_parking_area_day").on(
+      table.parkingAreaId,
+      table.dayOfWeek
+    ),
+  ]
 );
 
 export const parkingAreaSchedulesRelations = relations(
@@ -391,15 +432,9 @@ export const evStationSchedules = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (table) => {
-    return {
-      // Enforce unique schedule per EV station per day
-      unqEvStationDay: uniqueIndex("unq_ev_station_day").on(
-        table.evStationId,
-        table.dayOfWeek
-      ),
-    };
-  }
+  (table) => [
+    uniqueIndex("unq_ev_station_day").on(table.evStationId, table.dayOfWeek),
+  ]
 );
 
 export const evStationSchedulesRelations = relations(
