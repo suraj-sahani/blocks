@@ -44,7 +44,7 @@ export const SIGN_UP_SCHEMA = z.object({
   signUpType: z.enum(["user", "host"], { error: "Sign up type is required." }),
 });
 
-////////////////// ADD PARKING AREA SCHEMA ////////////////////
+////////////// LOCATION SCHEMA //////////////
 export const BASIC_LOCATION_SCHEMA = z.object({
   name: z.string().trim().nonempty({ error: "Name is required." }),
   address: z.string().trim().nonempty({ error: "Name is required" }),
@@ -61,6 +61,7 @@ export const BASIC_LOCATION_SCHEMA = z.object({
   images: z.array(z.file()).optional(),
 });
 
+////////////////// ADD PARKING AREA SCHEMA ////////////////////
 export const PARKING_AREA_CAPACITY_AND_SCHEDULE_SCHEMA = z.object({
   totalSlots: z
     .number({ error: "Total slots is required." })
@@ -95,6 +96,10 @@ export const PARKING_AREA_SLOT_SCHEMA = z.object({
     })
   ),
 });
+
+export const ADD_PARKING_SCHEMA = BASIC_LOCATION_SCHEMA.extend(
+  PARKING_AREA_CAPACITY_AND_SCHEDULE_SCHEMA.shape
+).extend(PARKING_AREA_SLOT_SCHEMA.shape);
 
 ////////////////// ADD EV STATION SCHEMA ////////////////////
 export const EV_STATION_CAPACITY_AND_SCHEDULE_SCHEMA = z.object({
@@ -134,28 +139,3 @@ export const EV_STATION_SLOT_SCHEMA = z.object({
 export const ADD_EV_SCHEMA = BASIC_LOCATION_SCHEMA.extend(
   EV_STATION_CAPACITY_AND_SCHEDULE_SCHEMA.shape
 ).extend(EV_STATION_SLOT_SCHEMA.shape);
-
-export const ADD_PARKING_SCHEMA_V2 = BASIC_LOCATION_SCHEMA.extend(
-  PARKING_AREA_CAPACITY_AND_SCHEDULE_SCHEMA.shape
-).extend(PARKING_AREA_SLOT_SCHEMA.shape);
-
-export const ADD_PARKING_SCHEMA = z.object({
-  name: z.string().trim().nonempty({ error: "Name is required." }),
-  address: z.string().trim().nonempty({ error: "Name is required" }),
-  city: z
-    .string({ error: "City is required." })
-    .nonempty({ error: "City is required." }),
-  state: z
-    .string({ error: "City is required." })
-    .nonempty({ error: "State is required." }),
-  zipcode: z.string().trim().optional(),
-  latitude: z.number({ error: "Latitude is required" }),
-  longitude: z.number({ error: "Longitude is required" }),
-  totalSlots: z
-    .number({ error: "Total slots is required." })
-    .min(1, { error: "Total slots must be a minimun of 1" }),
-  description: z.string().trim().optional(),
-  openingTime: z.date({ error: "Opening Time is required." }),
-  closingTime: z.date({ error: "Closing time is required." }),
-  images: z.array(z.file()).optional(),
-});

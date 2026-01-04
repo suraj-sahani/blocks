@@ -1,11 +1,11 @@
 import AddParkingAreaForm from "@/components/forms/add-parking-area-form";
-import AddParkingAreaFormV2 from "@/components/forms/add-parking-area-form-v2";
+
 import PageInfo from "@/components/host/page-info";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { getAllStates } from "@/lib/dal/location";
+import { getAllAmenities, getAllStates } from "@/lib/dal/location";
 
 export default async function AddParkingAreaPage() {
-  // const states = await getAllStates();
+  const states = await getAllStates();
+  const amenities = await getAllAmenities();
   return (
     <>
       <PageInfo
@@ -13,7 +13,7 @@ export default async function AddParkingAreaPage() {
         subtitle="List a new parking location"
       />
       <section className="p-8">
-        <AddParkingAreaFormV2 />
+        <AddParkingAreaForm states={states} amenities={amenities} />
       </section>
     </>
   );

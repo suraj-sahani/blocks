@@ -384,3 +384,48 @@ export const CHARGER_LEVELS = [
     description: "480V DC - Rapid charging",
   },
 ];
+
+export const schedule = [
+  {
+    dayOfWeek: 0,
+    isClosed: false,
+    openingTime: new Date(),
+    closingTime: new Date(),
+  },
+  {
+    dayOfWeek: 1,
+    isClosed: false,
+    openingTime: new Date(),
+    closingTime: new Date(),
+  },
+  {
+    dayOfWeek: 2,
+    isClosed: false,
+    openingTime: new Date(),
+    closingTime: new Date(),
+  },
+  {
+    dayOfWeek: 3,
+    isClosed: false,
+    openingTime: new Date(),
+    closingTime: new Date(),
+  },
+  {
+    dayOfWeek: 4,
+    isClosed: false,
+    openingTime: new Date(),
+    closingTime: new Date(),
+  },
+  {
+    dayOfWeek: 5,
+    isClosed: false,
+    openingTime: new Date(),
+    closingTime: new Date(),
+  },
+  {
+    dayOfWeek: 6,
+    isClosed: false,
+    openingTime: new Date(),
+    closingTime: new Date(),
+  },
+];

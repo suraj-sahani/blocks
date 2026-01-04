@@ -9,6 +9,7 @@ import {
   CONNECTOR_TYPES,
   DAYS,
   iconMappings,
+  schedule,
 } from "@/lib/constants";
 import clientLogger from "@/lib/pino/client";
 import {
@@ -50,51 +51,6 @@ const AMENITIES = [
   "Wheelchair Accessible",
   "Pet Friendly",
   "Food Nearby",
-];
-
-const schedule = [
-  {
-    dayOfWeek: 0,
-    isClosed: false,
-    openingTime: new Date(),
-    closingTime: new Date(),
-  },
-  {
-    dayOfWeek: 1,
-    isClosed: false,
-    openingTime: new Date(),
-    closingTime: new Date(),
-  },
-  {
-    dayOfWeek: 2,
-    isClosed: false,
-    openingTime: new Date(),
-    closingTime: new Date(),
-  },
-  {
-    dayOfWeek: 3,
-    isClosed: false,
-    openingTime: new Date(),
-    closingTime: new Date(),
-  },
-  {
-    dayOfWeek: 4,
-    isClosed: false,
-    openingTime: new Date(),
-    closingTime: new Date(),
-  },
-  {
-    dayOfWeek: 5,
-    isClosed: false,
-    openingTime: new Date(),
-    closingTime: new Date(),
-  },
-  {
-    dayOfWeek: 6,
-    isClosed: false,
-    openingTime: new Date(),
-    closingTime: new Date(),
-  },
 ];
 
 type Props = {
