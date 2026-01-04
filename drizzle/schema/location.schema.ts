@@ -58,8 +58,6 @@ export const parkingAreas = pgTable("parking_areas", {
   longitude: decimal("longitude", { precision: 10, scale: 7 }),
   totalSlots: integer("total_slots").notNull().default(0),
   description: varchar("description", { length: 1024 }),
-  openingTime: varchar("opening_time", { length: 5 }).notNull(),
-  closingTime: varchar("closing_time", { length: 5 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -82,8 +80,6 @@ export const evStations = pgTable("ev_stations", {
   longitude: decimal("longitude", { precision: 10, scale: 7 }),
   description: varchar("description", { length: 1024 }),
   totalSlots: smallint("total_slots").notNull().default(1),
-  openingTime: varchar("opening_time", { length: 5 }),
-  closingTime: varchar("closing_time", { length: 5 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

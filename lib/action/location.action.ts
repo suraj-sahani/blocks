@@ -24,12 +24,14 @@ export const addParkingArea = async (data: AddParkingAreaSchema) => {
       description,
       name,
       zipcode,
-      closingTime,
-      openingTime,
       latitude,
       longitude,
       totalSlots,
       images,
+      schedule,
+      slots,
+      state,
+      amenities,
     } = dataClone;
 
     const formattedData = {
@@ -39,16 +41,7 @@ export const addParkingArea = async (data: AddParkingAreaSchema) => {
       name: name,
       userId: "7472cba2-6037-488f-b5aa-53b1c39fe450",
       zipCode: zipcode || "",
-      closingTime: new Date(closingTime).toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      }),
-      openingTime: new Date(openingTime).toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      }),
+
       latitude: latitude.toString(),
       longitude: longitude.toString(),
       totalSlots: totalSlots,
