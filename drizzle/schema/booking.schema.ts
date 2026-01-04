@@ -10,10 +10,10 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import {
-  evChargingSlots,
+  evStationSlots,
   evStations,
   parkingAreas,
-  parkingSlots,
+  parkingAreaSlots,
 } from "./location.schema";
 import { payments, paymentStatusEnum } from "./payment.schema";
 import { users, userVehicles } from "./user.schema";
@@ -32,7 +32,7 @@ export const parkingBookings = pgTable("parking_bookings", {
     .references(() => parkingAreas.id, { onDelete: "cascade" }),
   parkingSlotId: uuid("parking_slot_id")
     .notNull()
-    .references(() => parkingSlots.id, { onDelete: "cascade" }),
+    .references(() => parkingAreaSlots.id, { onDelete: "cascade" }),
   vehicleBodyType: vehicleBodyTypeEnum("vehicle_body_type").notNull(), // UPDATED
   startTime: timestamp("start_time").notNull(),
   endTime: timestamp("end_time").notNull(),
@@ -60,7 +60,7 @@ export const evChargingBookings = pgTable("ev_charging_bookings", {
     .references(() => evStations.id, { onDelete: "cascade" }),
   evChargingSlotId: uuid("ev_charging_slot_id")
     .notNull()
-    .references(() => evChargingSlots.id, { onDelete: "cascade" }),
+    .references(() => evStationSlots.id, { onDelete: "cascade" }),
   connectorTypeUsed: evConnectorTypeEnum("connector_type_used").notNull(), // Which connector type the user booked/used
   startTime: timestamp("start_time").notNull(), // Planned start of charging
   endTime: timestamp("end_time"), // Planned end, could be null if "charge until full"
@@ -96,9 +96,9 @@ export const parkingBookingsRelations = relations(
       fields: [parkingBookings.parkingAreaId],
       references: [parkingAreas.id],
     }),
-    parkingSlot: one(parkingSlots, {
+    parkingSlot: one(parkingAreaSlots, {
       fields: [parkingBookings.parkingSlotId],
-      references: [parkingSlots.id],
+      references: [parkingAreaSlots.id],
     }),
     payment: one(payments),
   })
@@ -121,9 +121,9 @@ export const evChargingBookingsRelations = relations(
       fields: [evChargingBookings.evStationId],
       references: [evStations.id],
     }),
-    evChargingSlot: one(evChargingSlots, {
+    evChargingSlot: one(evStationSlots, {
       fields: [evChargingBookings.evChargingSlotId],
-      references: [evChargingSlots.id],
+      references: [evStationSlots.id],
     }),
     payment: one(payments),
   })

@@ -62,3 +62,13 @@ export enum EVChargingLevels {
   Level2 = "level_2",
   DcFast = "dc_fast",
 }
+
+export enum WeekDays {
+  Sunday = "sunday",
+  Monday = "monday",
+  Tuesday = "tuesday",
+  Wednesday = "wednesday",
+  Thursday = "thursday",
+  Friday = "friday",
+  Saturday = "saturday",
+}

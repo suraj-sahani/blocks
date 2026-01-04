@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { EVChargingLevels, EVConnectorTypes, WeekDays } from "./types";
 
 export const ENV_SCHEMA = z.object({
   GOOGLE_CLIENT_ID: z
@@ -69,7 +70,7 @@ export const PARKING_AREA_CAPACITY_AND_SCHEDULE_SCHEMA = z.object({
   amenities: z.array(z.uuid()).optional(),
   schedule: z.array(
     z.object({
-      dayOfWeek: z.number().int().min(0).max(6),
+      dayOfWeek: z.enum(WeekDays),
       openingTime: z.date(),
       closingTime: z.date(),
       isClosed: z.boolean(),
@@ -109,7 +110,7 @@ export const EV_STATION_CAPACITY_AND_SCHEDULE_SCHEMA = z.object({
   amenities: z.array(z.uuid()).optional(),
   schedule: z.array(
     z.object({
-      dayOfWeek: z.number().int().min(0).max(6),
+      dayOfWeek: z.enum(WeekDays, { error: "Day of week is required." }),
       openingTime: z.date(),
       closingTime: z.date(),
       isClosed: z.boolean(),
@@ -120,12 +121,12 @@ export const EV_STATION_CAPACITY_AND_SCHEDULE_SCHEMA = z.object({
 export const EV_STATION_SLOT_SCHEMA = z.object({
   slots: z.array(
     z.object({
-      connectorType: z
-        .string()
-        .min(1, { error: "Connector type is required." }),
-      chargingLevel: z
-        .string()
-        .min(1, { error: "Charging level is required." }),
+      connectorType: z.enum(EVConnectorTypes, {
+        error: "Connector type is required.",
+      }),
+      chargingLevel: z.enum(EVChargingLevels, {
+        error: "Charging level is required.",
+      }),
       pricePerKwh: z
         .number({ error: "Price per hour is required." })
         .min(1, { error: "Price per hour must be a minimun of $1" }),

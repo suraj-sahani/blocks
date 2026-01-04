@@ -160,7 +160,7 @@ export const parkingAreasRelations = relations(
       fields: [parkingAreas.cityId],
       references: [cities.id],
     }),
-    parkingSlots: many(parkingSlots),
+    parkingSlots: many(parkingAreaSlots),
     parkingBookings: many(parkingBookings),
     parkingAreaImages: many(parkingAreaImages),
     parkingAreaAmenities: many(parkingAreaAmenities),
@@ -177,7 +177,7 @@ export const evStationsRelations = relations(evStations, ({ one, many }) => ({
     fields: [evStations.cityId],
     references: [cities.id],
   }),
-  evChargingSlots: many(evChargingSlots),
+  evChargingSlots: many(evStationSlots),
   evChargingBookings: many(evChargingBookings),
   evStationImages: many(evStationImages),
   evStationAmenities: many(evStationAmenities),
@@ -230,7 +230,7 @@ export const evStationImagesRelations = relations(
   })
 );
 
-export const evChargingSlots = pgTable("ev_charging_slots", {
+export const evStationSlots = pgTable("ev_station_slots", {
   id: uuid("id").defaultRandom().primaryKey(),
   evStationId: uuid("ev_station_id")
     .notNull()
@@ -239,6 +239,7 @@ export const evChargingSlots = pgTable("ev_charging_slots", {
   connectorType: evConnectorTypeEnum("connector_type").notNull(),
   chargingLevel: evChargingLevelEnum("charging_level").notNull(),
   maxPowerKw: decimal("max_power_kw", { precision: 5, scale: 2 }).notNull(),
+  pricePerKwh: decimal("price_per_kwh", { precision: 5, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -247,18 +248,18 @@ export const evChargingSlots = pgTable("ev_charging_slots", {
 });
 
 export const evChargingSlotsRelations = relations(
-  evChargingSlots,
+  evStationSlots,
   ({ one, many }) => ({
     evStation: one(evStations, {
-      fields: [evChargingSlots.evStationId],
+      fields: [evStationSlots.evStationId],
       references: [evStations.id],
     }),
     evChargingBookings: many(evChargingBookings),
   })
 );
 
-export const parkingSlots = pgTable(
-  "parking_slots",
+export const parkingAreaSlots = pgTable(
+  "parking_area_slots",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     parkingAreaId: uuid("parking_area_id")
@@ -280,10 +281,10 @@ export const parkingSlots = pgTable(
 );
 
 export const parkingSlotsRelations = relations(
-  parkingSlots,
+  parkingAreaSlots,
   ({ one, many }) => ({
     parkingArea: one(parkingAreas, {
-      fields: [parkingSlots.parkingAreaId],
+      fields: [parkingAreaSlots.parkingAreaId],
       references: [parkingAreas.id],
     }),
 
@@ -297,7 +298,7 @@ export const parkingSlotVehicleTypes = pgTable(
   {
     parkingSlotId: uuid("parking_slot_id")
       .notNull()
-      .references(() => parkingSlots.id, { onDelete: "cascade" }),
+      .references(() => parkingAreaSlots.id, { onDelete: "cascade" }),
     vehicleTypeId: uuid("vehicle_type_id") // NEW: References the vehicleTypes table
       .notNull()
       .references(() => vehicleTypes.id, { onDelete: "cascade" }),
@@ -334,9 +335,9 @@ export const parkingSlotVehicleTypes = pgTable(
 export const parkingSlotVehicleTypesRelations = relations(
   parkingSlotVehicleTypes,
   ({ one }) => ({
-    parkingSlot: one(parkingSlots, {
+    parkingSlot: one(parkingAreaSlots, {
       fields: [parkingSlotVehicleTypes.parkingSlotId],
-      references: [parkingSlots.id],
+      references: [parkingAreaSlots.id],
     }),
     vehicleType: one(vehicleTypes, {
       fields: [parkingSlotVehicleTypes.vehicleTypeId],

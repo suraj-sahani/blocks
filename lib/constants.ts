@@ -24,7 +24,7 @@ import {
   Wifi,
   Zap,
 } from "lucide-react";
-import { EVChargingLevels, EVConnectorTypes } from "./types";
+import { EVChargingLevels, EVConnectorTypes, WeekDays } from "./types";
 
 export const IMAGEKIT_FOLDERS = {
   parking: "/blocks/parking_areas",
@@ -387,43 +387,43 @@ export const CHARGER_LEVELS = [
 
 export const schedule = [
   {
-    dayOfWeek: 0,
+    dayOfWeek: WeekDays.Sunday,
     isClosed: false,
     openingTime: new Date(),
     closingTime: new Date(),
   },
   {
-    dayOfWeek: 1,
+    dayOfWeek: WeekDays.Monday,
     isClosed: false,
     openingTime: new Date(),
     closingTime: new Date(),
   },
   {
-    dayOfWeek: 2,
+    dayOfWeek: WeekDays.Tuesday,
     isClosed: false,
     openingTime: new Date(),
     closingTime: new Date(),
   },
   {
-    dayOfWeek: 3,
+    dayOfWeek: WeekDays.Wednesday,
     isClosed: false,
     openingTime: new Date(),
     closingTime: new Date(),
   },
   {
-    dayOfWeek: 4,
+    dayOfWeek: WeekDays.Thursday,
     isClosed: false,
     openingTime: new Date(),
     closingTime: new Date(),
   },
   {
-    dayOfWeek: 5,
+    dayOfWeek: WeekDays.Friday,
     isClosed: false,
     openingTime: new Date(),
     closingTime: new Date(),
   },
   {
-    dayOfWeek: 6,
+    dayOfWeek: WeekDays.Saturday,
     isClosed: false,
     openingTime: new Date(),
     closingTime: new Date(),

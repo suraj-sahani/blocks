@@ -1,6 +1,5 @@
 import { upload, UploadResponse } from "@imagekit/next";
 import { AuthResponse } from "@imagekit/next/server";
-import { th } from "date-fns/locale";
 import { errorHandler } from "./utils";
 
 export interface ImageKitAuthenticator extends AuthResponse {
@@ -33,10 +32,31 @@ export const imageKitAuthenticator =
     }
   };
 
-export const uploadImageToImageKit = async (
+/**
+ * Uploads media files to ImageKit.
+ *
+ * @param files - Media files to upload
+ * @param folderName - Destination folder in ImageKit
+ *
+ * @returns An object containing:
+ * - `success` — Whether the upload succeeded
+ * - `message` — Status or error message
+ * - `data` — Upload responses (only present on success)
+ */
+export const uploadImagesToImageKit = async (
   files: File[],
   folderName: string
-) => {
+): Promise<
+  | {
+      success: true;
+      message: string;
+      data: UploadResponse[];
+    }
+  | {
+      success: false;
+      message: string;
+    }
+> => {
   try {
     const uploadedImages: UploadResponse[] = [];
 
