@@ -8,7 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { DAYS, iconMappings, schedule, VEHICLE_TYPES } from "@/lib/constants";
+import {
+  DAYS,
+  iconMappings,
+  mockAddParkingArea,
+  schedule,
+  VEHICLE_TYPES,
+} from "@/lib/constants";
 import clientLogger from "@/lib/pino/client";
 import {
   ADD_PARKING_SCHEMA,
@@ -19,7 +25,7 @@ import {
 import { AddParkingAreaSchema, Amenities, City, State } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useForm, useStore } from "@tanstack/react-form";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Bike,
   Car,
@@ -34,6 +40,9 @@ import { FieldInfo } from ".";
 import AddressSearch from "../address-search";
 import { AutoComplete } from "../ui/auto-complete";
 import ImageUpload from "../upload";
+import { addParkingArea } from "@/lib/action/location.action";
+import toast from "react-hot-toast";
+import { Spinner } from "../ui/spinner";
 
 type Props = {
   states: State[];
@@ -66,7 +75,8 @@ export default function AddParkingAreaForm({ states, amenities }: Props) {
       ],
     } as unknown as AddParkingAreaSchema,
     onSubmit: ({ value }) => {
-      clientLogger.info(value, "Form values");
+      clientLogger.info(value);
+      // mutate(value);
     },
   });
 
@@ -86,6 +96,18 @@ export default function AddParkingAreaForm({ states, amenities }: Props) {
     queryKey: [stateID],
     queryFn: () => getCitiesForState(stateID),
     enabled: stateID ? true : false,
+  });
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (val: AddParkingAreaSchema) => addParkingArea(val),
+    onSuccess({ success, message }) {
+      if (success) {
+        toast.success(message);
+        clientLogger.info({ success, message, data });
+      } else {
+        toast.error(message);
+      }
+    },
   });
 
   const cityList =
@@ -172,7 +194,7 @@ export default function AddParkingAreaForm({ states, amenities }: Props) {
 
     // Create slots for the next step based on the
     // total number of slots entered
-    if ("totalSlots" in result.data) {
+    if (form.state.values.slots.length === 0 && "totalSlots" in result.data) {
       const totalSlots = result.data.totalSlots;
       const slots: AddParkingAreaSchema["slots"] = Array.from(
         { length: totalSlots },
@@ -187,8 +209,12 @@ export default function AddParkingAreaForm({ states, amenities }: Props) {
       form.setFieldValue("slots", slots);
     }
 
+    clientLogger.info({ values: form.state.values, currentStep });
+
     await actions[step]();
   };
+
+  clientLogger.info(form.state.errors, "Errors");
   return (
     <div className="max-w-4xl mx-auto">
       {/* Progress Steps */}
@@ -271,11 +297,31 @@ export default function AddParkingAreaForm({ states, amenities }: Props) {
                 transition={{ duration: 0.3 }}
                 className="space-y-6"
               >
-                <div className="space-y-1">
-                  <h3 className="text-xl font-semibold">Location Details</h3>
-                  <p className="text-muted-foreground">
-                    Tell us about your parking location
-                  </p>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-semibold">Location Details</h3>
+                    <p className="text-muted-foreground">
+                      Tell us about your parking location
+                    </p>
+                  </div>
+
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      Object.entries(mockAddParkingArea).forEach(
+                        ([key, value]) => {
+                          form.setFieldValue(
+                            key as keyof AddParkingAreaSchema,
+                            value as never
+                          );
+                        }
+                      );
+
+                      clientLogger.info({ "Form Values": form.state.values });
+                    }}
+                  >
+                    Fill Mock Data
+                  </Button>
                 </div>
 
                 <div className="grid gap-6">
@@ -991,10 +1037,28 @@ export default function AddParkingAreaForm({ states, amenities }: Props) {
                 <Button type="button" variant="outline">
                   Save as Draft
                 </Button>
-                <Button type="submit" variant="hero" className="gap-2">
-                  <Plus className="w-4 h-4" />
-                  Publish Listing
-                </Button>
+                <form.Subscribe
+                  selector={(state) => [state.canSubmit, state.isSubmitting]}
+                  children={([canSubmit, isSubmitting]) => (
+                    <Button
+                      type="submit"
+                      variant="hero"
+                      className="gap-2"
+                      disabled={!canSubmit || isSubmitting}
+                    >
+                      <Activity mode={!isPending ? "visible" : "hidden"}>
+                        <>
+                          <Plus className="w-4 h-4" />
+                          Publish Listing
+                        </>
+                      </Activity>
+
+                      <Activity mode={isPending ? "visible" : "hidden"}>
+                        <Spinner />
+                      </Activity>
+                    </Button>
+                  )}
+                />
               </div>
             )}
           </div>

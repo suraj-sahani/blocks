@@ -19,6 +19,7 @@ import {
   Zap,
 } from "lucide-react";
 import {
+  AddParkingAreaSchema,
   EVChargingLevels,
   EVConnectorTypes,
   VehicleBodyTypes,
@@ -439,3 +440,81 @@ export const VEHICLE_TYPES = [
   { id: VehicleBodyTypes.Motorcycle, label: "Motorcycle", icon: Bike },
   { id: VehicleBodyTypes.Other, label: "Other", icon: Car },
 ];
+
+export const mockAddParkingArea: AddParkingAreaSchema = {
+  name: "Downtown EV & Parking Hub",
+  address: "123 Market St, Suite 400",
+  description:
+    "Secure covered parking with EV charging and CCTV. Close to transit and shopping.",
+  city: "34633016-babe-47ad-9339-7f490e260cd4",
+  state: "16beaa82-0e78-48ea-b0c1-6510559a71c7",
+  zipcode: "94103",
+  latitude: 37.7749,
+  longitude: -122.4194,
+  images: [] as File[],
+  totalSlots: 2,
+  amenities: [
+    "7f4134dd-4f63-4169-918f-818aaa66d51c",
+    "f605b73f-301c-45d3-a1ea-b59e371fa389",
+  ],
+  schedule: [
+    {
+      dayOfWeek: WeekDays.Sunday,
+      openingTime: new Date("2026-01-05T08:00:00.000Z"),
+      closingTime: new Date("2026-01-05T22:00:00.000Z"),
+      isClosed: false,
+    },
+    {
+      dayOfWeek: WeekDays.Monday,
+      openingTime: new Date("2026-01-06T08:00:00.000Z"),
+      closingTime: new Date("2026-01-06T22:00:00.000Z"),
+      isClosed: false,
+    },
+    {
+      dayOfWeek: WeekDays.Tuesday,
+      openingTime: new Date("2026-01-07T08:00:00.000Z"),
+      closingTime: new Date("2026-01-07T22:00:00.000Z"),
+      isClosed: false,
+    },
+    {
+      dayOfWeek: WeekDays.Wednesday,
+      openingTime: new Date("2026-01-08T08:00:00.000Z"),
+      closingTime: new Date("2026-01-08T22:00:00.000Z"),
+      isClosed: false,
+    },
+    {
+      dayOfWeek: WeekDays.Thursday,
+      openingTime: new Date("2026-01-09T08:00:00.000Z"),
+      closingTime: new Date("2026-01-09T22:00:00.000Z"),
+      isClosed: false,
+    },
+    {
+      dayOfWeek: WeekDays.Friday,
+      openingTime: new Date("2026-01-10T09:00:00.000Z"),
+      closingTime: new Date("2026-01-10T20:00:00.000Z"),
+      isClosed: false,
+    },
+    {
+      dayOfWeek: WeekDays.Saturday,
+      openingTime: new Date("2026-01-11T09:00:00.000Z"),
+      closingTime: new Date("2026-01-11T20:00:00.000Z"),
+      isClosed: false,
+    },
+  ],
+  slots: [
+    {
+      vehicleTypes: [VehicleBodyTypes.Sedan, VehicleBodyTypes.Truck],
+      pricePerHour: 5,
+      pricePerDay: 25,
+      pricePerWeek: 150,
+      pricePerMonth: 400,
+    },
+    {
+      vehicleTypes: [VehicleBodyTypes.Hatchback, VehicleBodyTypes.Coupe],
+      pricePerHour: 5,
+      pricePerDay: 25,
+      pricePerWeek: 150,
+      pricePerMonth: 400,
+    },
+  ],
+};

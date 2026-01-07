@@ -20,6 +20,7 @@ import { uploadImagesToImageKit } from "../imagekit";
 import { logger } from "../pino/server";
 import { AddEVSchema, AddParkingAreaSchema } from "../types";
 import { errorHandler } from "../utils";
+import { headers } from "next/headers";
 
 type InsertParkingArea = typeof parkingAreas.$inferInsert;
 type InsertEVStation = typeof evStations.$inferInsert;
@@ -28,7 +29,9 @@ type InsertParkingSlotForVehicleType =
 
 export const addParkingArea = async (data: AddParkingAreaSchema) => {
   try {
-    const session = await auth.api.getSession();
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
     if (!session) {
       throw new Error("Unauthorized");
@@ -195,7 +198,9 @@ export const addParkingArea = async (data: AddParkingAreaSchema) => {
 
 export const addEVStation = async (data: AddEVSchema) => {
   try {
-    const session = await auth.api.getSession();
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
     if (!session || !session.user.id) {
       throw new Error("Unauthorized");

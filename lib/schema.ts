@@ -1,5 +1,10 @@
 import * as z from "zod";
-import { EVChargingLevels, EVConnectorTypes, WeekDays } from "./types";
+import {
+  EVChargingLevels,
+  EVConnectorTypes,
+  VehicleBodyTypes,
+  WeekDays,
+} from "./types";
 
 export const ENV_SCHEMA = z.object({
   GOOGLE_CLIENT_ID: z
@@ -81,7 +86,7 @@ export const PARKING_AREA_CAPACITY_AND_SCHEDULE_SCHEMA = z.object({
 export const PARKING_AREA_SLOT_SCHEMA = z.object({
   slots: z.array(
     z.object({
-      vehicleTypes: z.array(z.uuid()),
+      vehicleTypes: z.array(z.enum(VehicleBodyTypes)),
       pricePerHour: z
         .number({ error: "Price per hour is required." })
         .min(1, { error: "Price per hour must be a minimun of $1" }),

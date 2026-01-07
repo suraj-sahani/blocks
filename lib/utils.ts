@@ -27,9 +27,7 @@ export const parseTime = (timeStr: string) => {
 };
 
 export const getAmenityIcon = (name: string) => {
-  return iconMappings.find(
-    (mapping) => mapping.name.toLowerCase() === name.toLowerCase()
-  );
+  return iconMappings[name as keyof typeof iconMappings] || null;
 };
 
 export const errorHandler = (error: unknown, message?: string) => {
