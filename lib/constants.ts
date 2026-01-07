@@ -1,30 +1,29 @@
 import {
   Accessibility,
-  Battery,
-  Bus,
+  Bike,
   CalendarCheck,
   Car,
   Cctv,
   Coffee,
-  ConciergeBell,
   CreditCard,
   FastForward,
   LampCeiling,
-  Luggage,
-  Mailbox,
-  Plug,
-  PlugZap,
   Shield,
-  ShieldPlus,
-  ShoppingBag,
   Toilet,
+  Truck,
   Umbrella,
   Users,
+  Van,
   Waves,
   Wifi,
   Zap,
 } from "lucide-react";
-import { EVChargingLevels, EVConnectorTypes, WeekDays } from "./types";
+import {
+  EVChargingLevels,
+  EVConnectorTypes,
+  VehicleBodyTypes,
+  WeekDays,
+} from "./types";
 
 export const IMAGEKIT_FOLDERS = {
   parking: "/blocks/parking_areas",
@@ -428,4 +427,15 @@ export const schedule = [
     openingTime: new Date(),
     closingTime: new Date(),
   },
+];
+
+export const VEHICLE_TYPES = [
+  { id: VehicleBodyTypes.Sedan, label: "Sedan", icon: Car },
+  { id: VehicleBodyTypes.SUV, label: "SUV", icon: Car },
+  { id: VehicleBodyTypes.Truck, label: "Truck", icon: Truck },
+  { id: VehicleBodyTypes.Van, label: "Van", icon: Van },
+  { id: VehicleBodyTypes.Hatchback, label: "Hatchback", icon: Car },
+  { id: VehicleBodyTypes.Coupe, label: "Coupe", icon: Car },
+  { id: VehicleBodyTypes.Motorcycle, label: "Motorcycle", icon: Bike },
+  { id: VehicleBodyTypes.Other, label: "Other", icon: Car },
 ];

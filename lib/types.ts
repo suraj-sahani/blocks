@@ -72,3 +72,14 @@ export enum WeekDays {
   Friday = "friday",
   Saturday = "saturday",
 }
+
+export enum VehicleBodyTypes {
+  Sedan = "sedan",
+  SUV = "suv",
+  Truck = "truck",
+  Van = "van",
+  Hatchback = "hatchback",
+  Coupe = "coupe",
+  Motorcycle = "motorcycle",
+  Other = "other",
+}

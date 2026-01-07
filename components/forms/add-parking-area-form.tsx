@@ -1,83 +1,39 @@
 "use client";
+import { AnimatePresence, motion } from "motion/react";
 import { Activity, useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
 
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import {
-  MapPin,
-  Upload,
-  Plus,
-  Check,
-  ChevronRight,
-  ChevronLeft,
-  Clock,
-  Car,
-  Bike,
-  Truck,
-  X,
-  ImageIcon,
-} from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AddParkingAreaSchema, Amenities, City, State } from "@/lib/types";
-import { useForm, useStore } from "@tanstack/react-form";
+import { DAYS, iconMappings, schedule, VEHICLE_TYPES } from "@/lib/constants";
+import clientLogger from "@/lib/pino/client";
 import {
   ADD_PARKING_SCHEMA,
   BASIC_LOCATION_SCHEMA,
   PARKING_AREA_CAPACITY_AND_SCHEDULE_SCHEMA,
   PARKING_AREA_SLOT_SCHEMA,
 } from "@/lib/schema";
+import { AddParkingAreaSchema, Amenities, City, State } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { useForm, useStore } from "@tanstack/react-form";
+import { useQuery } from "@tanstack/react-query";
+import {
+  Bike,
+  Car,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Plus,
+  Truck,
+} from "lucide-react";
 import { FieldInfo } from ".";
-import ImageUpload from "../upload";
 import AddressSearch from "../address-search";
 import { AutoComplete } from "../ui/auto-complete";
-import { iconMappings, schedule } from "@/lib/constants";
-import { useQuery } from "@tanstack/react-query";
-import clientLogger from "@/lib/pino/client";
-import { cn } from "@/lib/utils";
-
-const VEHICLE_TYPES = [
-  { id: "sedan", label: "Sedan", icon: Car },
-  { id: "suv", label: "SUV", icon: Car },
-  { id: "truck", label: "Truck", icon: Truck },
-  { id: "motorcycle", label: "Motorcycle", icon: Bike },
-  { id: "compact", label: "Compact", icon: Car },
-];
-
-const AMENITIES = [
-  "Covered Parking",
-  "24/7 Access",
-  "Security Guard",
-  "CCTV Surveillance",
-  "Well Lit",
-  "Elevator Access",
-  "EV Charging",
-  "Valet Service",
-  "Car Wash",
-  "Wheelchair Accessible",
-  "Restrooms",
-  "WiFi",
-];
-
-const DAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
-
-interface ParkingSlot {
-  id: number;
-  vehicleType: string;
-  pricePerHour: string;
-  pricePerDay: string;
-}
+import ImageUpload from "../upload";
 
 type Props = {
   states: State[];
